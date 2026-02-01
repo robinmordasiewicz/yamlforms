@@ -97,6 +97,7 @@ export interface FieldContent extends BaseContentElement {
   fieldType: 'text' | 'dropdown' | 'checkbox' | 'textarea';
   fieldName: string;       // Unique field identifier
   width?: number;          // Field width in points (default: full width)
+  height?: number;         // Field height in points (for textarea, default: 60)
   options?: FieldOption[]; // For dropdown fields
   default?: string | boolean;
   placeholder?: string;
@@ -208,6 +209,12 @@ export interface FormMetadata {
    * If not specified, uses default stylesheet.
    */
   stylesheet?: string;
+  /**
+   * Enable auto-numbering for standalone field labels.
+   * When true, field labels are prefixed with sequential numbers (1., 2., 3., etc.)
+   * Tables are excluded from numbering.
+   */
+  numbering?: boolean;
 }
 
 export interface FormSchema {

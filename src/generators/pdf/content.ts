@@ -146,7 +146,8 @@ function estimateElementHeight(ctx: LayoutContext, element: SchemaContentElement
     case 'field': {
       const fieldEl = element as FieldContent;
       const labelHeight = ctx.stylesheet.fields.label.fontSize + 4;
-      const fieldHeight = fieldEl.fieldType === 'textarea' ? 60 : 22;
+      const defaultHeight = fieldEl.fieldType === 'textarea' ? 60 : 22;
+      const fieldHeight = fieldEl.height ?? defaultHeight;
       return labelHeight + fieldHeight + FLOW_SPACING.field.marginTop + FLOW_SPACING.field.marginBottom;
     }
 
@@ -483,7 +484,10 @@ async function drawFieldContent(
   let fieldY: number;
   let fieldWidth: number;
   let fieldHeight: number;
-  if (element.fieldType === 'textarea') {
+  if (element.height) {
+    // Use custom height if specified
+    fieldHeight = element.height;
+  } else if (element.fieldType === 'textarea') {
     fieldHeight = 60;
   } else {
     // Match table cell field height for visual consistency

@@ -50,6 +50,11 @@
         "stylesheet": {
           "type": "string",
           "description": "Path to custom CSS stylesheet for PDF styling"
+        },
+        "numbering": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable auto-numbering for standalone field labels (1., 2., 3., etc.)"
         }
       }
     },
@@ -310,6 +315,11 @@
                 "type": "number",
                 "minimum": 20,
                 "description": "Field width in points (default: content width)"
+              },
+              "height": {
+                "type": "number",
+                "minimum": 20,
+                "description": "Field height in points (for textarea, default: 60)"
               },
               "options": {
                 "type": "array",

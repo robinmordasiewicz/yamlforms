@@ -105,6 +105,25 @@ export async function parseSchema(filePath: string): Promise<ParsedFormSchema> {
     );
   }
 
+  // Apply auto-numbering to fields and tables if enabled
+  if (schema.form?.numbering && schema.content) {
+    let counter = 0;
+    for (const element of schema.content) {
+      if (element.type === 'field') {
+        counter++;
+        const fieldElement = element as import('../types/index.js').FieldContent;
+        fieldElement.label = `${counter}. ${fieldElement.label}`;
+      } else if (element.type === 'table') {
+        counter++;
+        const tableElement = element as import('../types/index.js').TableContent;
+        // Prepend number to existing label, or create label with just the number
+        tableElement.label = tableElement.label
+          ? `${counter}. ${tableElement.label}`
+          : `${counter}.`;
+      }
+    }
+  }
+
   // Normalize fields
   const normalizedFields = schema.fields.map(normalizeField);
 
