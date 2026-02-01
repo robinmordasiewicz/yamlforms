@@ -1,0 +1,213 @@
+#!/usr/bin/env node
+
+/**
+ * markdown-2pdf CLI
+ * Generate fillable PDF forms from markdown and YAML schemas
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import chokidar from 'chokidar';
+import { resolve, dirname } from 'path';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import type { OutputFormat } from '../types/index.js';
+import {
+  executeGenerate,
+  printGenerateResults,
+  executeValidate,
+  printValidateResult,
+  executePreview,
+  printPreviewTable,
+  printPreviewJson,
+  printPreviewYaml,
+} from './commands/index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load package.json for version
+function getVersion(): string {
+  try {
+    const packagePath = resolve(__dirname, '../../package.json');
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+    return packageJson.version;
+  } catch {
+    return '1.0.0';
+  }
+}
+
+const program = new Command();
+
+program
+  .name('markdown-2pdf')
+  .description('Generate fillable PDF forms from markdown and YAML schemas')
+  .version(getVersion());
+
+// Generate command
+program
+  .command('generate')
+  .description('Generate documents from markdown content and form schema')
+  .argument('<content>', 'Path to markdown content file')
+  .option('-s, --schema <path>', 'Path to form schema YAML file')
+  .option('-o, --output <directory>', 'Output directory')
+  .option('-f, --format <formats>', 'Output formats (comma-separated: pdf,html,docx)', 'pdf')
+  .option('-c, --config <path>', 'Path to configuration file')
+  .option('-w, --watch', 'Watch for file changes and regenerate')
+  .option('-v, --verbose', 'Verbose output')
+  .action(async (content, options) => {
+    try {
+      // Parse formats
+      const formats = options.format.split(',').map((f: string) => f.trim()) as OutputFormat[];
+
+      const generateOptions = {
+        content,
+        schema: options.schema,
+        output: options.output,
+        format: formats,
+        config: options.config,
+        verbose: options.verbose,
+      };
+
+      if (options.watch) {
+        // Watch mode
+        console.log(chalk.cyan('Watching for changes...'));
+        console.log(chalk.gray('Press Ctrl+C to stop'));
+        console.log('');
+
+        const filesToWatch = [content];
+        if (options.schema) {
+          filesToWatch.push(options.schema);
+        }
+        if (options.config) {
+          filesToWatch.push(options.config);
+        }
+
+        const watcher = chokidar.watch(filesToWatch, {
+          persistent: true,
+          ignoreInitial: false,
+        });
+
+        let isGenerating = false;
+
+        const generate = async () => {
+          if (isGenerating) return;
+          isGenerating = true;
+
+          try {
+            console.log(chalk.gray(`[${new Date().toLocaleTimeString()}] Generating...`));
+            const results = await executeGenerate(generateOptions);
+            printGenerateResults(results);
+          } catch (err) {
+            const error = err as Error;
+            console.error(chalk.red('Error:'), error.message);
+          } finally {
+            isGenerating = false;
+          }
+        };
+
+        watcher.on('change', (path) => {
+          console.log(chalk.gray(`File changed: ${path}`));
+          generate();
+        });
+
+        watcher.on('ready', () => {
+          generate();
+        });
+      } else {
+        // Single generation
+        console.log(chalk.cyan('Generating documents...'));
+
+        if (options.verbose && options.schema) {
+          console.log(chalk.gray(`  Schema: ${resolve(options.schema)}`));
+        }
+        if (options.verbose) {
+          console.log(chalk.gray(`  Content: ${resolve(content)}`));
+        }
+
+        const results = await executeGenerate(generateOptions);
+        printGenerateResults(results);
+
+        // Exit with error if any generation failed
+        const hasError = results.some((r) => !r.success);
+        if (hasError) {
+          process.exit(1);
+        }
+      }
+    } catch (err) {
+      const error = err as Error;
+      console.error(chalk.red('Error:'), error.message);
+      process.exit(1);
+    }
+  });
+
+// Validate command
+program
+  .command('validate')
+  .description('Validate a form schema YAML file')
+  .argument('<schema>', 'Path to form schema YAML file')
+  .option('-v, --verbose', 'Verbose output')
+  .action(async (schema, options) => {
+    try {
+      const result = await executeValidate({ schema, verbose: options.verbose });
+      printValidateResult(result, options.verbose);
+
+      if (!result.valid) {
+        process.exit(1);
+      }
+    } catch (err) {
+      const error = err as Error;
+      console.error(chalk.red('Error:'), error.message);
+      process.exit(1);
+    }
+  });
+
+// Preview command
+program
+  .command('preview')
+  .description('Preview form fields from a schema (dry run)')
+  .argument('<schema>', 'Path to form schema YAML file')
+  .option('-f, --format <format>', 'Output format (table, json, yaml)', 'table')
+  .action(async (schema, options) => {
+    try {
+      const result = await executePreview({ schema, format: options.format });
+
+      switch (options.format) {
+        case 'json':
+          printPreviewJson(result);
+          break;
+        case 'yaml':
+          printPreviewYaml(result);
+          break;
+        default:
+          printPreviewTable(result);
+      }
+
+      if (!result.success) {
+        process.exit(1);
+      }
+    } catch (err) {
+      const error = err as Error;
+      console.error(chalk.red('Error:'), error.message);
+      process.exit(1);
+    }
+  });
+
+// Init command (scaffolds a new project)
+program
+  .command('init')
+  .description('Initialize a new markdown-2pdf project')
+  .argument('[directory]', 'Directory to initialize', '.')
+  .action(async (directory) => {
+    try {
+      const { initProject } = await import('./init.js');
+      await initProject(directory);
+    } catch (err) {
+      const error = err as Error;
+      console.error(chalk.red('Error:'), error.message);
+      process.exit(1);
+    }
+  });
+
+// Parse and execute
+program.parse();

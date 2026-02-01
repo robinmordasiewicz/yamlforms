@@ -1,0 +1,77 @@
+{
+  "name": "markdown-2pdf",
+  "version": "1.0.0",
+  "description": "Generate fillable PDF forms with AcroForm fields from markdown and YAML schemas",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "markdown-2pdf": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli/index.js",
+    "generate": "node dist/cli/index.js generate",
+    "validate": "node dist/cli/index.js validate",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:visual": "vitest run tests/visual",
+    "test:validation": "vitest run tests/validation",
+    "test:negative": "vitest run tests/negative",
+    "test:all": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:update-baselines": "UPDATE_BASELINES=1 vitest run tests/visual",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "pdf",
+    "forms",
+    "acroform",
+    "fillable",
+    "markdown",
+    "yaml",
+    "document-generation",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "chalk": "^5.3.0",
+    "chokidar": "^3.6.0",
+    "commander": "^12.1.0",
+    "css-tree": "^3.1.0",
+    "fontkit": "^2.0.4",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "marked": "^12.0.2",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@types/css-tree": "^2.3.11",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.14.0",
+    "@types/pixelmatch": "^5.2.6",
+    "@types/pngjs": "^6.0.4",
+    "@vitest/coverage-v8": "^1.6.0",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^4.0.379",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "schemas"
+  ]
+}

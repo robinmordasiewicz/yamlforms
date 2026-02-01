@@ -1,0 +1,651 @@
+# DDoS Protection Sizing - Complete Schema
+# Single-file source of truth with all content in flow mode
+# All form fields are embedded in tables within the content section
+# Uses simplified table schema for DRY (Don't Repeat Yourself) definitions
+
+$schema: "../schemas/form-schema.json"
+
+form:
+  id: network-ddos
+  title: Network DDoS Protection Questionnaire
+  version: "1.0.0"
+  author: Robin Mordasiewicz
+  description: Complete DDoS Protection requirements assessment form with content
+  positioning: flow
+
+content:
+  # ===========================================
+  # PAGE 1: DDoS Attack History & ASN Info
+  # ===========================================
+  - type: heading
+    level: 1
+    text: "Network DDoS Protection Questionnaire"
+
+  - type: paragraph
+    text: "F5 Distributed Cloud DDoS Mitigation provides multi-terabit protection against L3/L4 volumetric attacks with always-on or on-demand deployment options."
+
+  - type: rule
+
+  - type: field
+    label: "Current Status:"
+    fieldType: dropdown
+    fieldName: status
+    labelPosition: left
+    labelWidth: 100
+    width: 150
+    options:
+      - "Under Active Attack"
+      - "No Known Active Attack"
+
+  - type: field
+    label: "Attack Frequency:"
+    fieldType: dropdown
+    fieldName: frequency
+    labelPosition: left
+    labelWidth: 100
+    width: 150
+    options:
+      - "Daily"
+      - "Weekly"
+      - "Monthly"
+      - "Annually"
+      - "Unkown"
+
+  # Simplified table: using fieldPrefix + rowCount
+  - type: table
+    label: "Recent Attacks"
+    fieldPrefix: attack
+    rowCount: 15
+    columns:
+      - { label: "Date", width: 70, cellType: text, fieldSuffix: date }
+      - label: "Type"
+        width: 140
+        cellType: dropdown
+        fieldSuffix: type
+        options:
+          # Volumetric Floods (L3/L4)
+          - { value: udp_flood, label: "UDP Flood" }
+          - { value: icmp_flood, label: "ICMP Flood" }
+          - { value: syn_flood, label: "SYN Flood" }
+          - { value: syn_ack_flood, label: "SYN-ACK Flood" }
+          - { value: ack_flood, label: "ACK Flood" }
+          - { value: rst_flood, label: "RST Flood" }
+          - { value: tcp_flood, label: "TCP Flood" }
+          - { value: gre_flood, label: "GRE Flood" }
+          - { value: esp_flood, label: "ESP Flood" }
+          - { value: quic_flood, label: "QUIC Flood" }
+          # Protocol Attacks
+          - { value: ping_of_death, label: "Ping of Death" }
+          - { value: smurf_attack, label: "Smurf Attack" }
+          - { value: ip_fragmentation, label: "IP Fragmentation" }
+          - { value: teardrop, label: "Teardrop" }
+          - { value: tcp_session_exhaustion, label: "TCP Session Exhaustion" }
+          # Amplification/Reflection Attacks
+          - { value: dns_amplification, label: "DNS Amplification" }
+          - { value: ntp_amplification, label: "NTP Amplification" }
+          - { value: ssdp_amplification, label: "SSDP Amplification" }
+          - { value: memcached_amplification, label: "Memcached Amplification" }
+          - { value: chargen_reflection, label: "CHARGEN Reflection" }
+          - { value: snmp_amplification, label: "SNMP Amplification" }
+          - { value: mssql_reflection, label: "MSSQL Reflection" }
+          - { value: ldap_reflection, label: "LDAP/CLDAP Reflection" }
+          - { value: netbios_ddos, label: "NetBIOS DDoS" }
+          # Carpet Bombing
+          - { value: carpet_bombing, label: "Carpet Bombing" }
+          # Multi-Vector
+          - { value: multi_vector, label: "Multi-Vector Attack" }
+          - { value: other, label: "Other" }
+      - { label: "Gbps", width: 35, cellType: text, fieldSuffix: peak_size }
+      - { label: "Duration", width: 70, cellType: text, fieldSuffix: duration }
+      - label: "Impact"
+        width: 155
+        cellType: dropdown
+        fieldSuffix: impact
+        options:
+          # Severity-Based Impact Levels
+          - { value: none, label: "None" }
+          - { value: minimal, label: "Minimal" }
+          - { value: minor, label: "Minor" }
+          - { value: moderate, label: "Moderate" }
+          - { value: significant, label: "Significant" }
+          - { value: severe, label: "Severe" }
+          - { value: critical, label: "Critical" }
+          # Service Impact Types
+          - { value: performance_degradation, label: "Perf. Degradation" }
+          - { value: partial_outage, label: "Partial Outage" }
+          - { value: complete_outage, label: "Complete Outage" }
+          # Business Impact Types
+          - { value: revenue_loss, label: "Revenue Loss" }
+          - { value: sla_breach, label: "SLA Breach" }
+          - { value: customer_churn, label: "Customer Churn" }
+          - { value: reputation_damage, label: "Reputation Damage" }
+          - { value: operational_disruption, label: "Ops Disruption" }
+          - { value: regulatory_exposure, label: "Regulatory Exposure" }
+          # Secondary/Compound Impact
+          - { value: data_breach, label: "Data Breach" }
+          - { value: ransom_demand, label: "Ransom Demand" }
+          - { value: multi_dimensional, label: "Multi-Dimensional" }
+
+  - type: admonition
+    variant: warning
+    title: "ASN"
+    text: "Without an Autonomous System Number BGP-based DDoS mitigation options limited."
+
+  # Simplified table: using values syntax for label+field rows
+  - type: table
+    label: "ASN Information"
+    columns:
+      - { label: "ASN Number", width: 200, cellType: text }
+      - label: "Status"
+        width: 200
+        cellType: dropdown
+        options:
+          - { value: yes, label: "Under Active Attack" }
+          - { value: no, label: "No Known Active Attack" }
+    rows:
+      - values: ["asn_number", "active_attack"]
+
+  - type: admonition
+    variant: note
+    title: "BGP Network Prefix"
+    text: "The network prefix size must be a /24 or shorter (/23, /22, /21, etc.)."
+
+  # Simplified table: using fieldPrefix + rowCount
+  - type: table
+    label: "Network Prefixes"
+    fieldPrefix: prefix
+    rowCount: 4
+    columns:
+      - { label: "Prefix (CIDR)", width: 150, cellType: text, fieldSuffix: cidr }
+      - { label: "Size", width: 80, cellType: text, fieldSuffix: size }
+      - label: "BGP Announced"
+        width: 120
+        cellType: dropdown
+        fieldSuffix: bgp
+        options:
+          - { value: yes, label: "Yes" }
+          - { value: no, label: "No" }
+
+  - type: field
+    label: "Total Network Prefixes"
+    fieldType: text
+    fieldName: total_prefixes
+    width: 200
+
+  # ===========================================
+  # PAGE 2: Data Centers & Infrastructure
+  # ===========================================
+  - type: heading
+    level: 2
+    text: "Infrastructure Overview"
+
+  - type: heading
+    level: 3
+    text: "Data Centers"
+
+  # Simplified table: using fieldPrefix + rowCount
+  - type: table
+    label: "Data Center Inventory"
+    fieldPrefix: dc
+    rowCount: 4
+    columns:
+      - { label: "Location", width: 150, cellType: text, fieldSuffix: location }
+      - label: "Provider Type"
+        width: 150
+        cellType: dropdown
+        fieldSuffix: provider
+        options:
+          - { value: onprem, label: "On-Prem" }
+          - { value: colo, label: "Colo" }
+          - { value: cloud, label: "Cloud" }
+      - { label: "Router Count", width: 100, cellType: text, fieldSuffix: routers }
+
+  - type: field
+    label: "Total Data Centers"
+    fieldType: text
+    fieldName: total_data_centers
+    width: 200
+
+  - type: heading
+    level: 3
+    text: "Edge Routers"
+
+  - type: paragraph
+    text: "EDGE/CORE/BORDER routers to monitor for DDoS attack detection?"
+
+  # Simplified table: using fieldPrefix + rowCount
+  - type: table
+    label: "Router Inventory"
+    fieldPrefix: router
+    rowCount: 4
+    columns:
+      - { label: "Location", width: 150, cellType: text, fieldSuffix: location }
+      - label: "Router Type"
+        width: 120
+        cellType: dropdown
+        fieldSuffix: type
+        options:
+          - { value: edge, label: "Edge" }
+          - { value: core, label: "Core" }
+          - { value: border, label: "Border" }
+      - { label: "Vendor/Model", width: 150, cellType: text, fieldSuffix: model }
+
+  - type: field
+    label: "Total Edge Routers"
+    fieldType: text
+    fieldName: total_edge_routers
+    width: 200
+
+  - type: heading
+    level: 3
+    text: "Bandwidth Requirements"
+
+  - type: paragraph
+    text: "Please provide the amount of CLEAN BANDWIDTH utilized by the network prefixes you would like to protect:"
+
+  # Simplified table: using values syntax for label+field rows
+  - type: table
+    label: "Bandwidth Metrics"
+    columns:
+      - { label: "Metric", width: 250, cellType: label }
+      - { label: "Value (Mbps)", width: 150, cellType: text }
+    rows:
+      - values: ["95th Percentile Inbound Bandwidth", "bandwidth_95th"]
+      - values: ["Peak Inbound Bandwidth", "bandwidth_peak"]
+      - values: ["Average Inbound Bandwidth", "bandwidth_avg"]
+
+  # ===========================================
+  # PAGE 3: Protection Mode & Attack Types
+  # ===========================================
+  - type: heading
+    level: 2
+    text: "Protection Mode & Attack Types"
+
+  - type: heading
+    level: 3
+    text: "Mode of Protection"
+
+  - type: paragraph
+    text: "Please select your preferred protection mode:"
+
+  # Simplified table: using values syntax for label+checkbox rows
+  - type: table
+    label: "Protection Mode Selection"
+    columns:
+      - { label: "Mode", width: 300, cellType: label }
+      - { label: "Select", width: 80, cellType: checkbox }
+    rows:
+      - values: ["CONTINUOUS (Always On)", "mode_continuous"]
+      - values: ["ON-DEMAND (Always Available)", "mode_ondemand"]
+
+  - type: heading
+    level: 3
+    text: "Activation Method (On-Demand Only)"
+
+  - type: paragraph
+    text: "If On-Demand, how should mitigation be activated?"
+
+  # Simplified table: using values syntax
+  - type: table
+    label: "Activation Method"
+    columns:
+      - { label: "Method", width: 300, cellType: label }
+      - { label: "Select", width: 80, cellType: checkbox }
+    rows:
+      - values: ["Automatic (F5 detects attack and activates)", "activation_automatic"]
+      - values: ["Manual (Customer initiates activation)", "activation_manual"]
+      - values: ["Hybrid (Auto-detect with manual confirmation)", "activation_hybrid"]
+
+  # Simplified table: using values syntax
+  - type: table
+    columns:
+      - { label: "Acceptable time to mitigate (minutes)", width: 280, cellType: label }
+      - { label: "Value", width: 100, cellType: text }
+    rows:
+      - values: ["Mitigation Time", "mitigation_time"]
+
+  - type: heading
+    level: 3
+    text: "L3/L4 Volumetric Attacks"
+
+  - type: paragraph
+    text: "Attack types to protect against:"
+
+  # Two-column attack type selection (label + checkbox pairs)
+  - type: table
+    label: "L3/L4 Attack Types"
+    columns:
+      - { label: "Attack Type", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+      - { label: "Attack Type", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+    rows:
+      - values: ["UDP Floods", "attack_udp_floods", "SSDP Amplification", "attack_ssdp_amp"]
+      - values: ["TCP SYN Floods", "attack_tcp_syn", "Memcached Amplification", "attack_memcached"]
+      - values: ["TCP ACK Floods", "attack_tcp_ack", "Fragmentation Attacks", "attack_fragmentation"]
+      - values: ["ICMP Floods", "attack_icmp", "Teardrop Attacks", "attack_teardrop"]
+      - values: ["DNS Amplification", "attack_dns_amp", "Smurf Attacks", "attack_smurf"]
+      - values: ["NTP Amplification", "attack_ntp_amp", "", ""]
+
+  - type: heading
+    level: 3
+    text: "L7 Application-Layer Attacks"
+
+  - type: paragraph
+    text: "Do you need L7 application-layer protection?"
+
+  # Simplified table: using values syntax
+  - type: table
+    label: "L7 Protection Required"
+    columns:
+      - { label: "Option", width: 300, cellType: label }
+      - { label: "Select", width: 80, cellType: checkbox }
+    rows:
+      - values: ["Yes - Requires Advanced tier or WAF", "l7_required_yes"]
+      - values: ["No", "l7_required_no"]
+
+  - type: paragraph
+    text: "Attack types to protect against:"
+
+  # Two-column attack type selection
+  - type: table
+    label: "L7 Attack Types"
+    columns:
+      - { label: "Attack Type", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+      - { label: "Attack Type", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+    rows:
+      - values: ["HTTP Floods", "attack_http_floods", "SSL/TLS Exhaustion", "attack_ssl_exhaustion"]
+      - values: ["Slowloris", "attack_slowloris", "API Abuse", "attack_api_abuse"]
+      - values: ["Slow POST", "attack_slow_post", "Login Page Attacks", "attack_login_page"]
+      - values: ["DNS Query Floods", "attack_dns_query", "", ""]
+
+  - type: admonition
+    variant: warning
+    title: "L7 DDoS"
+    text: "Layer 7 DDoS mitigation with ML-based anomaly detection requires the Advanced WAAP tier."
+
+  # ===========================================
+  # PAGE 4: Detection, Alerting & Integration
+  # ===========================================
+  - type: heading
+    level: 2
+    text: "Detection, Alerting & Integration"
+
+  - type: heading
+    level: 3
+    text: "Detection Requirements"
+
+  - type: paragraph
+    text: "How should DDoS attacks be detected?"
+
+  # Simplified table: using values syntax
+  - type: table
+    label: "Detection Methods"
+    columns:
+      - { label: "Detection Method", width: 350, cellType: label }
+      - { label: "Select", width: 80, cellType: checkbox }
+    rows:
+      - values: ["Traffic analysis on edge routers (NetFlow/sFlow)", "detect_netflow"]
+      - values: ["Inline detection (Always On mode)", "detect_inline"]
+      - values: ["External monitoring integration", "detect_external"]
+
+  - type: heading
+    level: 3
+    text: "Alerting Requirements"
+
+  - type: paragraph
+    text: "How do you want to be notified of attacks?"
+
+  # Two-column alert method selection
+  - type: table
+    label: "Alert Methods"
+    columns:
+      - { label: "Alert Method", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+      - { label: "Alert Method", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+    rows:
+      - values: ["Email alerts", "alert_email", "Webhook/API integration", "alert_webhook"]
+      - values: ["SMS/Text alerts", "alert_sms", "SIEM integration", "alert_siem"]
+      - values: ["Phone call (24x7 SOC)", "alert_phone", "", ""]
+
+  - type: paragraph
+    text: "Alert contacts:"
+
+  # Contact table with label column + text fields
+  - type: table
+    label: "Alert Contacts"
+    columns:
+      - { label: "Contact Type", width: 100, cellType: label }
+      - { label: "Name", width: 120, cellType: text }
+      - { label: "Email", width: 150, cellType: text }
+      - { label: "Phone", width: 110, cellType: text }
+    rows:
+      - values: ["Primary", "contact_primary_name", "contact_primary_email", "contact_primary_phone"]
+      - values: ["Secondary", "contact_secondary_name", "contact_secondary_email", "contact_secondary_phone"]
+      - values: ["Escalation", "contact_escalation_name", "contact_escalation_email", "contact_escalation_phone"]
+
+  - type: heading
+    level: 3
+    text: "Reporting Requirements"
+
+  - type: paragraph
+    text: "What DDoS reporting do you need?"
+
+  # Two-column report type selection
+  - type: table
+    label: "Reporting Options"
+    columns:
+      - { label: "Report Type", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+      - { label: "Report Type", width: 180, cellType: label }
+      - { label: "Select", width: 60, cellType: checkbox }
+    rows:
+      - values: ["Real-time attack dashboard", "report_realtime", "Monthly summary reports", "report_monthly"]
+      - values: ["Post-attack reports", "report_post_attack", "Custom reporting", "report_custom"]
+
+  - type: heading
+    level: 3
+    text: "BGP Integration"
+
+  - type: paragraph
+    text: "Will you establish BGP sessions with F5 for traffic diversion?"
+
+  # Simplified table: using values syntax
+  - type: table
+    label: "BGP Options"
+    columns:
+      - { label: "BGP Option", width: 300, cellType: label }
+      - { label: "Select", width: 80, cellType: checkbox }
+    rows:
+      - values: ["Yes - Direct BGP peering", "bgp_direct"]
+      - values: ["Yes - Through IX (Internet Exchange)", "bgp_ix"]
+      - values: ["No - DNS-based diversion only", "bgp_dns_only"]
+
+  - type: paragraph
+    text: "BGP session details (if applicable):"
+
+  # Simplified table: using fieldPrefix + rowCount
+  - type: table
+    label: "BGP Session Details"
+    fieldPrefix: bgp
+    rowCount: 2
+    columns:
+      - { label: "Peer Location", width: 200, cellType: text, fieldSuffix: peer_location }
+      - { label: "Your Router IP", width: 200, cellType: text, fieldSuffix: router_ip }
+
+  - type: heading
+    level: 3
+    text: "GRE Tunnel Requirements"
+
+  # Simplified table: using values syntax
+  - type: table
+    label: "GRE Tunnel Options"
+    columns:
+      - { label: "GRE Option", width: 300, cellType: label }
+      - { label: "Select", width: 80, cellType: checkbox }
+    rows:
+      - values: ["Yes - GRE tunnels to our routers", "gre_yes"]
+      - values: ["No - Direct routing", "gre_no"]
+
+  # Simplified table: using values syntax
+  - type: table
+    columns:
+      - { label: "Number of GRE tunnel endpoints", width: 250, cellType: label }
+      - { label: "Count", width: 100, cellType: text }
+    rows:
+      - values: ["GRE Endpoints", "gre_endpoints"]
+
+  # ===========================================
+  # PAGE 5: Service Level & Summary
+  # ===========================================
+  - type: heading
+    level: 2
+    text: "Service Level & Summary"
+
+  - type: heading
+    level: 3
+    text: "Existing DDoS Solutions"
+
+  - type: paragraph
+    text: "Do you have existing DDoS protection?"
+
+  # Existing solutions table with dropdown
+  - type: table
+    label: "Existing Solutions"
+    columns:
+      - { label: "Solution", width: 150, cellType: text }
+      - { label: "Provider", width: 150, cellType: text }
+      - label: "Action"
+        width: 150
+        cellType: dropdown
+        options:
+          - { value: replace, label: "Replace" }
+          - { value: layer, label: "Layer" }
+    rows:
+      - values: ["existing_solution", "existing_provider", "existing_action"]
+
+  - type: heading
+    level: 3
+    text: "SLA Requirements"
+
+  - type: paragraph
+    text: "What SLA requirements do you have?"
+
+  # Simplified table: using values syntax
+  - type: table
+    label: "SLA Metrics"
+    columns:
+      - { label: "SLA Metric", width: 280, cellType: label }
+      - { label: "Value", width: 100, cellType: text }
+    rows:
+      - values: ["Time to Detect (minutes)", "sla_detect_time"]
+      - values: ["Time to Mitigate (minutes)", "sla_mitigate_time"]
+      - values: ["Uptime SLA (%)", "sla_uptime"]
+      - values: ["False Positive Rate (%)", "sla_false_positive"]
+
+  - type: heading
+    level: 3
+    text: "Support Level"
+
+  - type: paragraph
+    text: "What level of DDoS support do you need?"
+
+  # Simplified table: using values syntax
+  - type: table
+    label: "Support Options"
+    columns:
+      - { label: "Support Level", width: 300, cellType: label }
+      - { label: "Select", width: 80, cellType: checkbox }
+    rows:
+      - values: ["Standard - Business hours support", "support_standard"]
+      - values: ["Enhanced - 24x7 SOC monitoring", "support_enhanced"]
+      - values: ["Enhanced Plus - Dedicated SOC resources", "support_enhanced_plus"]
+
+  - type: rule
+
+  - type: heading
+    level: 2
+    text: "Summary: DDoS Protection Requirements"
+
+  # Summary table with mixed label+text and label+dropdown
+  - type: table
+    label: "Requirements Summary"
+    columns:
+      - { label: "Requirement", width: 250, cellType: label }
+      - { label: "Value", width: 200 }
+    rows:
+      - cells:
+          - { type: label, value: "Customer ASN" }
+          - type: dropdown
+            fieldName: summary_has_asn
+            options:
+              - { value: yes, label: "Yes" }
+              - { value: no, label: "No" }
+      - cells:
+          - { type: label, value: "Number of Prefixes" }
+          - { type: text, fieldName: summary_prefixes }
+      - cells:
+          - { type: label, value: "Number of Data Centers" }
+          - { type: text, fieldName: summary_data_centers }
+      - cells:
+          - { type: label, value: "Number of Edge Routers" }
+          - { type: text, fieldName: summary_edge_routers }
+      - cells:
+          - { type: label, value: "Clean Bandwidth (95th percentile) Mbps" }
+          - { type: text, fieldName: summary_bandwidth }
+      - cells:
+          - { type: label, value: "Protection Mode" }
+          - type: dropdown
+            fieldName: summary_protection_mode
+            options:
+              - { value: always_on, label: "Always On" }
+              - { value: on_demand, label: "On-Demand" }
+      - cells:
+          - { type: label, value: "L3/L4 Protection" }
+          - type: dropdown
+            fieldName: summary_l3l4
+            options:
+              - { value: yes, label: "Yes" }
+              - { value: no, label: "No" }
+      - cells:
+          - { type: label, value: "L7 Protection" }
+          - type: dropdown
+            fieldName: summary_l7
+            options:
+              - { value: yes, label: "Yes" }
+              - { value: no, label: "No" }
+      - cells:
+          - { type: label, value: "Support Level" }
+          - type: dropdown
+            fieldName: summary_support
+            options:
+              - { value: standard, label: "Standard" }
+              - { value: enhanced, label: "Enhanced" }
+              - { value: enhanced_plus, label: "Enhanced Plus" }
+
+  - type: paragraph
+    text: "Network diagram attached:"
+
+  - type: table
+    columns:
+      - { label: "Diagram Attached", width: 150, cellType: label }
+      - { label: "Yes", width: 60, cellType: checkbox }
+      - { label: "No", width: 60, cellType: checkbox }
+    rows:
+      - values: ["", "diagram_attached_yes", "diagram_attached_no"]
+
+  - type: paragraph
+    text: "Additional notes or special requirements:"
+
+  - type: table
+    label: "Additional Notes"
+    columns:
+      - { label: "Notes", width: 468, cellType: text }
+    rows:
+      - values: ["additional_notes"]
+
+# Empty fields array - all fields are now embedded in tables
+fields: []

@@ -1,0 +1,678 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "form-schema/v1",
+  "title": "Form Schema",
+  "description": "Schema for defining fillable PDF forms",
+  "type": "object",
+  "required": ["form", "fields"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Schema version identifier"
+    },
+    "form": {
+      "type": "object",
+      "required": ["id", "title"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$",
+          "description": "Unique form identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Form title"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Form version (semver)"
+        },
+        "pages": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Number of pages"
+        },
+        "author": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "positioning": {
+          "type": "string",
+          "enum": ["flow"],
+          "default": "flow",
+          "description": "Positioning mode: 'flow' - content elements stack vertically"
+        },
+        "stylesheet": {
+          "type": "string",
+          "description": "Path to custom CSS stylesheet for PDF styling"
+        }
+      }
+    },
+    "content": {
+      "type": "array",
+      "description": "Content elements to render in the PDF (headings, paragraphs, admonitions, rules)",
+      "items": {
+        "$ref": "#/definitions/contentElement"
+      }
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "#/definitions/field"
+      }
+    },
+    "calculations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/calculation"
+      }
+    },
+    "conditionalFields": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/conditionalField"
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["if", "then"],
+            "properties": {
+              "if": { "type": "string" },
+              "then": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "contentPosition": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "description": "X coordinate in points (defaults to left margin)"
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Y coordinate in points (from bottom of page). Optional in flow mode."
+        }
+      }
+    },
+    "contentElement": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["heading", "paragraph", "rule", "admonition", "spacer", "table", "field"],
+          "description": "Content element type"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Page number (1-indexed). Optional in flow mode - content flows automatically."
+        },
+        "position": {
+          "$ref": "#/definitions/contentPosition",
+          "description": "Position in points. Optional in flow mode."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "heading" } }
+          },
+          "then": {
+            "required": ["level", "text"],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 6,
+                "description": "Heading level (1-6)"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Heading text"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "paragraph" } }
+          },
+          "then": {
+            "required": ["text"],
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Paragraph text"
+              },
+              "maxWidth": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Maximum width in points"
+              },
+              "fontSize": {
+                "type": "number",
+                "minimum": 6,
+                "maximum": 72,
+                "description": "Font size in points"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "admonition" } }
+          },
+          "then": {
+            "required": ["variant", "title", "text"],
+            "properties": {
+              "variant": {
+                "type": "string",
+                "enum": ["warning", "note", "info", "tip", "danger"],
+                "description": "Admonition style variant"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Admonition title"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Admonition content"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "spacer" } }
+          },
+          "then": {
+            "required": ["height"],
+            "properties": {
+              "height": {
+                "type": "number",
+                "minimum": 1,
+                "description": "Spacer height in points"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "table" } }
+          },
+          "then": {
+            "required": ["columns"],
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Optional label/description to display above the table"
+              },
+              "columns": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/definitions/tableColumn"
+                },
+                "description": "Table column definitions"
+              },
+              "fieldPrefix": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+                "description": "Base name for auto-generated field names (used with rowCount)"
+              },
+              "rowCount": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 50,
+                "description": "Number of identical rows to generate using column definitions"
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/tableRow"
+                },
+                "description": "Table data rows (optional if rowCount is specified)"
+              },
+              "rowHeight": {
+                "type": "number",
+                "minimum": 10,
+                "description": "Height of data rows in points (default: 22)"
+              },
+              "headerHeight": {
+                "type": "number",
+                "minimum": 10,
+                "description": "Height of header row in points (default: 24)"
+              },
+              "showBorders": {
+                "type": "boolean",
+                "description": "Whether to show table borders (default: true)"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "field" } }
+          },
+          "then": {
+            "required": ["label", "fieldType", "fieldName"],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Label displayed above or beside the field"
+              },
+              "labelPosition": {
+                "type": "string",
+                "enum": ["above", "left"],
+                "default": "above",
+                "description": "Position of the label relative to the field"
+              },
+              "labelWidth": {
+                "type": "number",
+                "minimum": 20,
+                "description": "Label width in points when labelPosition is 'left' (default: 120)"
+              },
+              "fieldType": {
+                "type": "string",
+                "enum": ["text", "dropdown", "checkbox", "textarea"],
+                "description": "Type of form field"
+              },
+              "fieldName": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+                "description": "Unique field identifier"
+              },
+              "width": {
+                "type": "number",
+                "minimum": 20,
+                "description": "Field width in points (default: content width)"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/fieldOption"
+                },
+                "description": "Options for dropdown fields"
+              },
+              "default": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "boolean" }
+                ],
+                "description": "Default value for the field"
+              },
+              "placeholder": {
+                "type": "string",
+                "description": "Placeholder text for text fields"
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Whether the field is required"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "position": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "description": "X coordinate in points"
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Y coordinate in points"
+        },
+        "width": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Field width in points"
+        },
+        "height": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Field height in points"
+        }
+      }
+    },
+    "tableColumn": {
+      "type": "object",
+      "required": ["label", "width"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Column header label"
+        },
+        "width": {
+          "type": "number",
+          "minimum": 10,
+          "description": "Column width in points"
+        },
+        "cellType": {
+          "type": "string",
+          "enum": ["text", "dropdown", "checkbox", "label"],
+          "description": "Default cell type for all cells in this column"
+        },
+        "fieldSuffix": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "description": "Suffix for auto-generated field names (used with fieldPrefix and rowCount)"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/fieldOption"
+          },
+          "description": "Options for dropdown cells in this column"
+        }
+      }
+    },
+    "tableCell": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": {
+              "const": "label"
+            },
+            "value": {
+              "type": "string",
+              "description": "Static text to display in cell"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "fieldName"],
+          "properties": {
+            "type": {
+              "enum": ["text", "dropdown", "checkbox"]
+            },
+            "fieldName": {
+              "type": "string",
+              "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+              "description": "Form field name for this cell"
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/fieldOption"
+              },
+              "description": "Options for dropdown cells"
+            },
+            "default": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "boolean" }
+              ],
+              "description": "Default value for the cell field"
+            }
+          }
+        }
+      ]
+    },
+    "tableRow": {
+      "type": "object",
+      "properties": {
+        "cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tableCell"
+          },
+          "description": "Full cell definitions for this row"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "boolean" }
+            ]
+          },
+          "description": "Compact format: array of label values or fieldNames (type inferred from column cellType)"
+        }
+      },
+      "anyOf": [
+        { "required": ["cells"] },
+        { "required": ["values"] }
+      ]
+    },
+    "fieldOption": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "required": ["value", "label"],
+          "properties": {
+            "value": { "type": "string" },
+            "label": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "Regex pattern for validation"
+        },
+        "message": {
+          "type": "string",
+          "description": "Validation error message"
+        },
+        "min": {
+          "type": "number",
+          "description": "Minimum numeric value"
+        },
+        "max": {
+          "type": "number",
+          "description": "Maximum numeric value"
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "field": {
+      "type": "object",
+      "required": ["name", "type", "label", "page", "position"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "description": "Field name (used as form field ID)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text", "checkbox", "radio", "dropdown", "textarea", "signature"],
+          "description": "Field type"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Field label"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Page number (1-indexed)"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "placeholder": {
+          "type": "string"
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "multiline": {
+          "type": "boolean",
+          "default": false
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/fieldOption"
+          },
+          "description": "Options for radio, dropdown fields"
+        },
+        "default": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "boolean" },
+            { "type": "number" }
+          ]
+        },
+        "validation": {
+          "$ref": "#/definitions/validation"
+        },
+        "position": {
+          "$ref": "#/definitions/position"
+        },
+        "fontSize": {
+          "type": "number",
+          "minimum": 6,
+          "maximum": 72,
+          "default": 12
+        },
+        "fontColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "backgroundColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "borderColor": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "readOnly": {
+          "type": "boolean",
+          "default": false
+        },
+        "hidden": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "enum": ["radio", "dropdown"] } }
+          },
+          "then": {
+            "required": ["options"]
+          }
+        }
+      ]
+    },
+    "calculation": {
+      "type": "object",
+      "required": ["name", "formula"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+        },
+        "formula": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "string",
+          "enum": ["number", "currency", "percentage", "text"]
+        },
+        "decimals": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        }
+      }
+    },
+    "conditionalField": {
+      "type": "object",
+      "required": ["trigger"],
+      "properties": {
+        "trigger": {
+          "type": "object",
+          "required": ["field", "value"],
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "value": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "boolean" },
+                { "type": "number" }
+              ]
+            },
+            "operator": {
+              "type": "string",
+              "enum": ["equals", "not_equals", "contains", "greater", "less"],
+              "default": "equals"
+            }
+          }
+        },
+        "show": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "hide": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "enable": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "disable": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

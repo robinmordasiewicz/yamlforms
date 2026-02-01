@@ -1,0 +1,309 @@
+/* ================================================================
+   INDUSTRY-STANDARD PDF FORM STYLESHEET
+   Based on: ISO 9241-115, PDF/UA (ISO 14289-1), WCAG 2.1 AA,
+   Section 508, UK GDS, HIPAA, HL7/FHIR guidelines
+   ================================================================ */
+
+/* ========================================
+   CSS Variables (Custom Properties)
+   ======================================== */
+:root {
+  /*
+   * Color Palette - WCAG 2.1 AA Compliant
+   * All text colors verified for 4.5:1+ contrast on white
+   */
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-gray: #666666;           /* 5.74:1 contrast on white */
+  --color-light-gray: #d1d1d1;     /* Decorative only */
+  --color-dark-gray: #333333;      /* 12.63:1 contrast on white */
+  --color-text: #333333;           /* Primary text - 12.63:1 contrast */
+  --color-text-secondary: #555555; /* Secondary text - 7.46:1 contrast */
+  --color-border: #767676;         /* 4.54:1 contrast - meets AA */
+  --color-border-focus: #0066cc;   /* Focus indicator */
+
+  /*
+   * Admonition Colors - Optimized for readability
+   * Background colors light enough for text contrast
+   * Border colors meet 3:1 for non-text elements
+   */
+  --warning-bg: #fef3cd;           /* Warm yellow */
+  --warning-border: #856404;       /* 4.71:1 on warning-bg */
+  --warning-text: #664d03;         /* 5.84:1 on warning-bg */
+
+  --note-bg: #cce5ff;              /* Light blue */
+  --note-border: #004085;          /* 7.05:1 on note-bg */
+  --note-text: #004085;
+
+  --info-bg: #d1ecf1;              /* Light cyan */
+  --info-border: #0c5460;          /* 6.49:1 on info-bg */
+  --info-text: #0c5460;
+
+  --tip-bg: #d4edda;               /* Light green */
+  --tip-border: #155724;           /* 7.08:1 on tip-bg */
+  --tip-text: #155724;
+
+  --danger-bg: #f8d7da;            /* Light red */
+  --danger-border: #721c24;        /* 6.28:1 on danger-bg */
+  --danger-text: #721c24;
+
+  /*
+   * Typography - Based on ISO 9241-115 and government standards
+   * Sans-serif for body (better screen/print legibility)
+   * 12pt base meets UK GDS and accessibility guidelines
+   */
+  --font-family: Helvetica;
+  --font-family-bold: HelveticaBold;
+  --font-family-mono: Courier;
+  --base-font-size: 12pt;          /* UK GDS minimum, ISO recommended */
+  --base-line-height: 1.5;         /* ISO 9241-115 recommendation */
+
+  /*
+   * Spacing System - Consistent rhythm
+   * Based on 6pt base unit for mathematical harmony
+   */
+  --spacing-xs: 3pt;               /* 0.5 units */
+  --spacing-sm: 6pt;               /* 1 unit - label gap */
+  --spacing-md: 12pt;              /* 2 units - paragraph spacing */
+  --spacing-lg: 18pt;              /* 3 units - field spacing */
+  --spacing-xl: 24pt;              /* 4 units - section spacing */
+  --spacing-xxl: 36pt;             /* 6 units - major sections */
+}
+
+/* ========================================
+   Page Layout
+   Per government form standards: 1" margins minimum
+   ======================================== */
+@page {
+  size: letter;                    /* 612pt x 792pt (US standard) */
+  margin: 72pt;                    /* 1 inch all sides */
+}
+
+.header {
+  font-family: var(--font-family);
+  font-size: 10pt;
+  color: var(--color-gray);
+}
+
+.footer {
+  font-family: var(--font-family);
+  font-size: 9pt;
+  color: var(--color-gray);
+}
+
+/* ========================================
+   Headings - Clear Visual Hierarchy
+   Size scale: 20pt -> 16pt -> 14pt -> 12pt -> 11pt -> 11pt
+   ======================================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-bold);
+  color: var(--color-black);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 20pt;
+  margin-bottom: var(--spacing-lg);
+}
+
+h2 {
+  font-size: 16pt;
+  margin-top: var(--spacing-xl);
+}
+
+h3 {
+  font-size: 14pt;
+  margin-top: var(--spacing-lg);
+}
+
+h4 {
+  font-size: 12pt;
+  margin-top: var(--spacing-md);
+}
+
+h5 {
+  font-size: 11pt;
+}
+
+h6 {
+  font-size: 11pt;
+}
+
+/* ========================================
+   Paragraphs - Optimized for Readability
+   ======================================== */
+p {
+  font-family: var(--font-family);
+  font-size: var(--base-font-size);
+  color: var(--color-text);
+  line-height: var(--base-line-height);
+  max-width: 468pt;                /* ~65 characters at 12pt */
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========================================
+   Horizontal Rules - Subtle Separation
+   ======================================== */
+hr {
+  border: none;
+  border-top: 1pt solid var(--color-light-gray);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* ========================================
+   Admonitions - WCAG Compliant Colors
+   ======================================== */
+.admonition {
+  padding: var(--spacing-md);
+  border-left-width: 4pt;
+  border-left-style: solid;
+}
+
+.admonition-title {
+  font-family: var(--font-family-bold);
+  font-size: 12pt;
+  margin-bottom: var(--spacing-sm);
+}
+
+.admonition-content {
+  font-family: var(--font-family);
+  font-size: 11pt;
+  line-height: 1.4;
+}
+
+.admonition-warning {
+  background-color: var(--warning-bg);
+  border-left-color: var(--warning-border);
+}
+
+.admonition-warning .admonition-title,
+.admonition-warning .admonition-content {
+  color: var(--warning-text);
+}
+
+.admonition-note {
+  background-color: var(--note-bg);
+  border-left-color: var(--note-border);
+}
+
+.admonition-note .admonition-title,
+.admonition-note .admonition-content {
+  color: var(--note-text);
+}
+
+.admonition-info {
+  background-color: var(--info-bg);
+  border-left-color: var(--info-border);
+}
+
+.admonition-info .admonition-title,
+.admonition-info .admonition-content {
+  color: var(--info-text);
+}
+
+.admonition-tip {
+  background-color: var(--tip-bg);
+  border-left-color: var(--tip-border);
+}
+
+.admonition-tip .admonition-title,
+.admonition-tip .admonition-content {
+  color: var(--tip-text);
+}
+
+.admonition-danger {
+  background-color: var(--danger-bg);
+  border-left-color: var(--danger-border);
+}
+
+.admonition-danger .admonition-title,
+.admonition-danger .admonition-content {
+  color: var(--danger-text);
+}
+
+/* ========================================
+   Form Fields - Base Styles
+   Border meets 3:1 contrast for UI components (WCAG)
+   ======================================== */
+.field {
+  border-width: 1pt;
+  border-style: solid;
+  border-color: var(--color-border);
+  background-color: var(--color-white);
+}
+
+/*
+ * Field Labels - Top-aligned per research
+ * Research shows 50% faster form completion with top labels
+ */
+.field-label {
+  font-family: var(--font-family);
+  font-size: 11pt;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ========================================
+   Form Fields - Text Input
+   Height allows comfortable text entry
+   ======================================== */
+.field-text {
+  font-size: 12pt;
+  height: 28pt;
+  padding: var(--spacing-sm);
+}
+
+/* ========================================
+   Form Fields - Textarea
+   ======================================== */
+.field-textarea {
+  font-size: 12pt;
+  padding: var(--spacing-sm);
+  line-height: 1.4;
+}
+
+/* ========================================
+   Form Fields - Checkbox
+   WCAG 2.1 AA: 24x24px minimum (24pt = 33.3px)
+   ======================================== */
+.field-checkbox {
+  width: 24pt;
+  height: 24pt;
+}
+
+/* ========================================
+   Form Fields - Radio
+   WCAG 2.1 AA: 24x24px minimum
+   ======================================== */
+.field-radio {
+  width: 24pt;
+  height: 24pt;
+}
+
+/* ========================================
+   Form Fields - Dropdown
+   ======================================== */
+.field-dropdown {
+  font-size: 12pt;
+  height: 28pt;
+  padding: var(--spacing-sm);
+}
+
+/* ========================================
+   Form Fields - Signature
+   Clear visual distinction for legal fields
+   ======================================== */
+.field-signature {
+  border-color: var(--color-border);
+  border-width: 1.5pt;
+  background-color: #fafafa;
+  font-size: 14pt;
+}
+
+.field-signature.required {
+  border-color: var(--danger-border);
+  border-width: 2pt;
+}

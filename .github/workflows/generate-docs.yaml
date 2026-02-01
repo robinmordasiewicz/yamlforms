@@ -1,0 +1,115 @@
+name: Generate Documentation
+
+on:
+  push:
+    paths:
+      - 'content/**'
+      - 'schemas/**'
+      - 'styles/**'
+      - 'examples/**'
+    branches:
+      - main
+  pull_request:
+    paths:
+      - 'content/**'
+      - 'schemas/**'
+      - 'styles/**'
+      - 'examples/**'
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Build CLI
+        run: npm run build
+
+      - name: Validate schemas
+        run: |
+          echo "Validating example schemas..."
+          npm run start -- validate examples/simple-form/schema.yaml
+          npm run start -- validate examples/advanced-form/schema.yaml
+
+      - name: Generate example documents
+        run: |
+          echo "Generating simple form..."
+          npm run start -- generate examples/simple-form/content.md \
+            --schema examples/simple-form/schema.yaml \
+            --output dist/simple-form \
+            --format pdf,html
+
+          echo "Generating advanced form..."
+          npm run start -- generate examples/advanced-form/content.md \
+            --schema examples/advanced-form/schema.yaml \
+            --output dist/advanced-form \
+            --format pdf,html
+
+      - name: List generated files
+        run: |
+          echo "Generated files:"
+          find dist -type f | head -20
+
+      - name: Upload PDF artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-forms
+          path: dist/**/*.pdf
+          retention-days: 30
+
+      - name: Upload HTML artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-docs
+          path: dist/**/*.html
+          retention-days: 30
+
+  # Deploy HTML to GitHub Pages (only on main branch)
+  deploy:
+    needs: generate
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download HTML artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: html-docs
+          path: html-docs
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: html-docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
