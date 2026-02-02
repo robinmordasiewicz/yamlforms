@@ -271,14 +271,17 @@ export function generateCssFromTokens(): string {
     .inline-field input[type="text"],
     .inline-field select,
     .inline-field textarea {
-      padding: ${rem(components.field.text.padding)} ${rem(spacing[2])};
+      height: ${px(components.field.text.height)};
+      padding: 0 ${rem(spacing[1])};
       font-size: ${rem(components.field.text.fontSize)};
       border: ${px(components.field.base.borderWidth)} solid ${colors.gray[400]};
       border-radius: ${px(borders.radius.base)};
+      box-sizing: border-box;
     }
 
     .inline-field select {
       min-width: 100px;
+      height: ${px(components.field.dropdown.height)};
     }
 
     /* Content table styles */
@@ -300,9 +303,10 @@ export function generateCssFromTokens(): string {
     .content-table th,
     .content-table td {
       border: ${px(components.table.borderWidth)} solid ${components.table.borderColor};
-      padding: ${rem(components.table.cellPadding)} ${rem(spacing[2])};
+      padding: ${rem(components.table.cellPadding)} ${rem(spacing[1])};
       text-align: left;
       vertical-align: middle;
+      height: ${px(components.table.rowHeight)};
     }
 
     .content-table th {
@@ -311,19 +315,22 @@ export function generateCssFromTokens(): string {
       color: ${components.table.headerTextColor};
       white-space: nowrap;
       overflow: visible;
+      height: ${px(components.table.headerHeight)};
     }
 
     .content-table td {
       vertical-align: middle;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding: 2px;
     }
 
     .table-input {
       width: 100%;
-      padding: ${rem(spacing[1])} ${rem(components.table.cellPadding)};
+      height: ${px(components.field.text.height)};
+      padding: 0 ${rem(spacing[1])};
       border: ${px(components.field.base.borderWidth)} solid ${colors.gray[400]};
-      border-radius: ${px(borders.radius.sm)};
+      border-radius: 0;
       font-size: ${rem(components.table.cellFontSize)};
       background-color: ${components.field.base.backgroundColor};
       box-sizing: border-box;
@@ -336,9 +343,10 @@ export function generateCssFromTokens(): string {
 
     .table-select {
       width: 100%;
-      padding: ${rem(spacing[1])} ${rem(components.table.cellPadding)};
+      height: ${px(components.field.dropdown.height)};
+      padding: 0 ${rem(spacing[1])};
       border: ${px(components.field.base.borderWidth)} solid ${colors.gray[400]};
-      border-radius: ${px(borders.radius.sm)};
+      border-radius: 0;
       font-size: ${rem(components.table.cellFontSize)};
       background-color: ${components.field.base.backgroundColor};
       box-sizing: border-box;
