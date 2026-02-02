@@ -81,35 +81,75 @@ jobs:
           path: dist/**/*.html
           retention-days: 30
 
-  # Deploy HTML to GitHub Pages (only on main branch)
+  # Deploy HTML to gh-pages branch (only on main branch)
   deploy:
     needs: generate
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      contents: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download HTML artifacts
         uses: actions/download-artifact@v4
         with:
           name: html-docs
           path: html-docs
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Download PDF artifacts
+        uses: actions/download-artifact@v4
         with:
+          name: pdf-forms
           path: html-docs
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Create index page
+        run: |
+          cat > html-docs/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>PDF Generator - Examples</title>
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+              h1 { color: #333; }
+              ul { list-style: none; padding: 0; }
+              li { margin: 1rem 0; }
+              a { color: #0066cc; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              .format { color: #666; font-size: 0.9em; }
+            </style>
+          </head>
+          <body>
+            <h1>PDF Generator - Example Documents</h1>
+            <ul>
+              <li>
+                <strong>Simple Form</strong>
+                <span class="format">
+                  [<a href="simple-form/content.html">HTML</a>]
+                  [<a href="simple-form/content.pdf">PDF</a>]
+                </span>
+              </li>
+              <li>
+                <strong>Advanced Form</strong>
+                <span class="format">
+                  [<a href="advanced-form/content.html">HTML</a>]
+                  [<a href="advanced-form/content.pdf">PDF</a>]
+                </span>
+              </li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./html-docs
+          publish_branch: gh-pages
