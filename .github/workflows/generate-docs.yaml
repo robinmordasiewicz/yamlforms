@@ -140,13 +140,6 @@ jobs:
                   [<a href="schemas/network-ddos/network-ddos.pdf">PDF</a>]
                 </span>
               </li>
-              <li>
-                <strong>Table Content Test</strong>
-                <span class="format">
-                  [<a href="schemas/table-test/table-test.html">HTML</a>]
-                  [<a href="schemas/table-test/table-test.pdf">PDF</a>]
-                </span>
-              </li>
             </ul>
 
             <h2>Example Documents</h2>
