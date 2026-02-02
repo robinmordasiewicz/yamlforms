@@ -25,7 +25,7 @@ describe('DDoS Form Quality Standards (Schema-Only)', () => {
   let schema: Awaited<ReturnType<typeof parseSchema>>;
 
   beforeAll(async () => {
-    const schemaPath = resolve(process.cwd(), 'schemas/ddos-complete.yaml');
+    const schemaPath = resolve(process.cwd(), 'schemas/network-ddos.yaml');
     schema = await parseSchema(schemaPath);
     pdf = await generatePdf({ schema });
   });

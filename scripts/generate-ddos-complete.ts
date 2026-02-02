@@ -16,7 +16,7 @@ import {
 } from '../tests/helpers/layout-analyzer.js';
 
 const PROJECT_ROOT = resolve(dirname(import.meta.url.replace('file://', '')), '..');
-const SCHEMA_FILE = resolve(PROJECT_ROOT, 'schemas/ddos-complete.yaml');
+const SCHEMA_FILE = resolve(PROJECT_ROOT, 'schemas/network-ddos.yaml');
 const OUTPUT_DIR = resolve(PROJECT_ROOT, 'dist');
 const OUTPUT_FILE = resolve(OUTPUT_DIR, 'ddos-complete.pdf');
 

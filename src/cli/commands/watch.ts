@@ -104,8 +104,9 @@ export async function executeWatch(options: WatchOptions): Promise<void> {
     console.log(chalk.gray('  Watching for changes... (Ctrl+C to exit)\n'));
   });
 
-  watcher.on('error', (error) => {
-    console.error(chalk.red(`\nWatcher error: ${error.message}`));
+  watcher.on('error', (error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(chalk.red(`\nWatcher error: ${message}`));
   });
 
   // Handle graceful shutdown
