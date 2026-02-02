@@ -370,6 +370,30 @@ export const components = {
     padding: spacing[4],
   },
 
+  // Page Layout (HTML visual page simulation)
+  pageLayout: {
+    // A4 dimensions in pixels (at 96 DPI: 1pt = 1.333px)
+    a4: {
+      width: 793.7, // 595.28pt * (96/72)
+      height: 1122.5, // 841.89pt * (96/72)
+      contentWidth: 601.7, // (595.28 - 72 - 72)pt * (96/72) = 451.28pt in pixels
+      margin: 96, // 72pt in pixels
+    },
+    // Letter dimensions in pixels
+    letter: {
+      width: 816, // 612pt * (96/72)
+      height: 1056, // 792pt * (96/72)
+      contentWidth: 624, // (612 - 72 - 72)pt * (96/72) = 468pt in pixels
+      margin: 96, // 72pt in pixels
+    },
+    // Visual styling
+    backgroundColor: '#e5e5e5',
+    pageBackgroundColor: '#ffffff',
+    pageShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+    pageGap: 24,
+    wrapperPadding: 24,
+  },
+
   // Buttons (HTML specific)
   button: {
     fontSize: typography.fontSize.sm,

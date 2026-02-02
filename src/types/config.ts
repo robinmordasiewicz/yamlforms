@@ -29,11 +29,18 @@ export interface PdfConfig {
   compress: boolean;
 }
 
+export interface PageLayoutConfig {
+  enabled: boolean;
+  pageSize: PageSize;
+  showPageNumbers: boolean;
+}
+
 export interface HtmlConfig {
   template: string;
   embedStyles: boolean;
   includeJs: boolean;
   cssFile: string;
+  pageLayout: PageLayoutConfig;
 }
 
 export interface DocxConfig {
@@ -113,6 +120,11 @@ export const DEFAULT_CONFIG: Config = {
     embedStyles: true,
     includeJs: true,
     cssFile: '',
+    pageLayout: {
+      enabled: true,
+      pageSize: 'letter', // Match PDF default for consistent table widths
+      showPageNumbers: true,
+    },
   },
   docx: {
     referenceDoc: '',

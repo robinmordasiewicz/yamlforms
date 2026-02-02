@@ -4,6 +4,7 @@
 
 import { colors, typography, spacing, borders, components, ptToRem } from './tokens.js';
 import type { AdmonitionVariant } from '../types/stylesheet.js';
+import type { PageLayoutConfig } from '../types/config.js';
 
 /**
  * Convert points directly to px (1pt = 1px for PDF-HTML parity at standard viewing)
@@ -14,8 +15,14 @@ const px = (pt: number): string => `${pt}px`;
 /**
  * Generate CSS string from design tokens
  */
-export function generateCssFromTokens(): string {
+export function generateCssFromTokens(pageLayout?: PageLayoutConfig): string {
   const rem = ptToRem;
+  const pageLayoutEnabled = pageLayout?.enabled ?? true;
+  const pageSize = pageLayout?.pageSize ?? 'a4';
+
+  // Get page dimensions from tokens
+  const pageDimensions =
+    pageSize === 'a4' ? components.pageLayout.a4 : components.pageLayout.letter;
 
   return `
     * {
@@ -29,15 +36,50 @@ export function generateCssFromTokens(): string {
       font-size: ${rem(components.paragraph.fontSize)};
       line-height: ${typography.lineHeight.relaxed};
       color: ${colors.gray[900]};
-      background-color: ${colors.white};
+      background-color: ${pageLayoutEnabled ? components.pageLayout.backgroundColor : colors.white};
+      ${pageLayoutEnabled ? `min-height: 100vh; padding: ${components.pageLayout.wrapperPadding}px 0;` : ''}
     }
 
+    /* Legacy container (for non-page-layout mode) */
     .container {
       max-width: ${px(components.container.maxWidth)};
       margin: 0 auto;
       padding: ${rem(components.container.padding)};
       background: ${colors.white};
       min-height: 100vh;
+    }
+
+    /* Page Layout Mode - Visual A4/Letter pages */
+    .page-layout-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: ${components.pageLayout.pageGap}px;
+    }
+
+    .page {
+      width: ${pageDimensions.width}px;
+      min-height: ${pageDimensions.height}px;
+      background: ${components.pageLayout.pageBackgroundColor};
+      box-shadow: ${components.pageLayout.pageShadow};
+      padding: ${pageDimensions.margin}px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .page-content {
+      width: ${pageDimensions.contentWidth}px;
+      max-width: 100%;
+    }
+
+    .page-number {
+      position: absolute;
+      bottom: ${pageDimensions.margin / 2}px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: ${rem(typography.fontSize.xs)};
+      color: ${colors.gray[500]};
     }
 
     header {
@@ -357,11 +399,12 @@ export function generateCssFromTokens(): string {
     }
 
     /* Table checkbox centering - match PDF alignment */
-    .table-checkbox-cell {
+    /* Use higher specificity to override .content-table td { text-align: left } */
+    .content-table td.table-checkbox-cell {
       text-align: center;
     }
 
-    .table-checkbox-cell input[type="checkbox"] {
+    .content-table td.table-checkbox-cell input[type="checkbox"] {
       margin: 0;
       vertical-align: middle;
     }
@@ -386,12 +429,53 @@ export function generateCssFromTokens(): string {
 
 ${generateAdmonitionVariantCss()}
 
+    /* Responsive fallback for narrow screens */
+    @media (max-width: ${pageDimensions.width + 48}px) {
+      body {
+        background: ${colors.white};
+        padding: 0;
+      }
+      .page-layout-wrapper {
+        gap: 0;
+      }
+      .page {
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        padding: ${rem(spacing[4])};
+      }
+      .page-content {
+        width: 100%;
+      }
+      .page-number {
+        display: none;
+      }
+    }
+
     @media print {
       body {
         background: ${colors.white};
+        padding: 0;
       }
       .container {
         padding: 0;
+      }
+      .page-layout-wrapper {
+        gap: 0;
+      }
+      .page {
+        box-shadow: none;
+        page-break-after: always;
+        margin: 0;
+        padding: 0;
+        width: auto;
+        min-height: auto;
+      }
+      .page:last-child {
+        page-break-after: auto;
+      }
+      .page-number {
+        display: none;
       }
       .form-actions {
         display: none;
@@ -399,6 +483,11 @@ ${generateAdmonitionVariantCss()}
       .content-table {
         page-break-inside: avoid;
       }
+    }
+
+    @page {
+      size: ${pageSize === 'a4' ? 'A4' : 'letter'};
+      margin: 72pt;
     }
   `;
 }
