@@ -299,9 +299,9 @@ function renderTable(element: TableContent): string {
   // Calculate total table width from column widths
   const totalWidth = columns.reduce((sum, col) => sum + (col.width ?? 100), 0);
 
-  // Generate header row - use min-width to allow headers to expand if needed
+  // Generate header row - use fixed width to match PDF rendering
   const headerCells = columns
-    .map((col) => `<th style="min-width: ${col.width}px">${escapeHtml(col.label)}</th>`)
+    .map((col) => `<th style="width: ${col.width}px">${escapeHtml(col.label)}</th>`)
     .join('');
   const headerRow = `<tr>${headerCells}</tr>`;
 
@@ -311,7 +311,9 @@ function renderTable(element: TableContent): string {
       const cells = row
         .map((cell, colIdx) => {
           const col = columns[colIdx];
-          return `<td>${renderTableCell(cell, col)}</td>`;
+          // Add centering class for checkbox cells to match PDF alignment
+          const cellClass = cell.type === 'checkbox' ? ' class="table-checkbox-cell"' : '';
+          return `<td${cellClass}>${renderTableCell(cell, col)}</td>`;
         })
         .join('');
       return `<tr>${cells}</tr>`;
@@ -320,7 +322,7 @@ function renderTable(element: TableContent): string {
 
   return `
     ${tableLabel}
-    <table class="content-table" style="min-width: ${totalWidth}px">
+    <table class="content-table" style="width: ${totalWidth}px">
       <thead>${headerRow}</thead>
       <tbody>${dataRows}</tbody>
     </table>`;

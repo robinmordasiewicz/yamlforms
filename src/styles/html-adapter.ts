@@ -293,7 +293,6 @@ export function generateCssFromTokens(): string {
     }
 
     .content-table {
-      width: auto;
       table-layout: fixed;
       border-collapse: collapse;
       margin-bottom: ${rem(spacing[3])};
@@ -355,6 +354,16 @@ export function generateCssFromTokens(): string {
     .table-select:focus {
       outline: none;
       border-color: ${colors.primary.main};
+    }
+
+    /* Table checkbox centering - match PDF alignment */
+    .table-checkbox-cell {
+      text-align: center;
+    }
+
+    .table-checkbox-cell input[type="checkbox"] {
+      margin: 0;
+      vertical-align: middle;
     }
 
     /* Admonition styles */
