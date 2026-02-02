@@ -66,9 +66,9 @@ content:
     fieldPrefix: attack
     rowCount: 5
     columns:
-      - { label: 'Date', width: 70, cellType: text, fieldSuffix: date }
+      - { label: 'Date', width: 65, cellType: text, fieldSuffix: date }
       - label: 'Type'
-        width: 140
+        width: 160
         cellType: dropdown
         fieldSuffix: type
         options:
@@ -105,9 +105,9 @@ content:
           - { value: multi_vector, label: 'Multi-Vector Attack' }
           - { value: other, label: 'Other' }
       - { label: 'Gbps', width: 35, cellType: text, fieldSuffix: peak_size }
-      - { label: 'Duration', width: 70, cellType: text, fieldSuffix: duration }
+      - { label: 'Duration', width: 65, cellType: text, fieldSuffix: duration }
       - label: 'Impact'
-        width: 155
+        width: 143
         cellType: dropdown
         fieldSuffix: impact
         options:
@@ -140,9 +140,9 @@ content:
     fieldPrefix: asn
     rowCount: 4
     columns:
-      - { label: 'ASN Number', width: 100, cellType: text, fieldSuffix: number }
+      - { label: 'ASN Number', width: 93, cellType: text, fieldSuffix: number }
       - label: 'Type'
-        width: 80
+        width: 95
         cellType: dropdown
         fieldSuffix: type
         options:
@@ -150,7 +150,7 @@ content:
           - { value: public_4byte, label: 'Public 4-byte' }
           - { value: private, label: 'Private' }
       - label: 'Ownership'
-        width: 100
+        width: 120
         cellType: dropdown
         fieldSuffix: ownership
         options:
@@ -179,10 +179,10 @@ content:
     fieldPrefix: upstream
     rowCount: 4
     columns:
-      - { label: 'Provider Name', width: 150, cellType: text, fieldSuffix: name }
+      - { label: 'Provider Name', width: 143, cellType: text, fieldSuffix: name }
       - { label: 'Provider ASN', width: 100, cellType: text, fieldSuffix: asn }
       - label: 'Connection Type'
-        width: 120
+        width: 130
         cellType: dropdown
         fieldSuffix: type
         options:
@@ -190,7 +190,7 @@ content:
           - { value: peering, label: 'Peering' }
           - { value: ix, label: 'Internet Exchange' }
       - label: 'BGP Communities'
-        width: 100
+        width: 95
         cellType: dropdown
         fieldSuffix: communities
         options:
@@ -202,9 +202,9 @@ content:
     fieldPrefix: prefix
     rowCount: 8
     columns:
-      - { label: 'Prefix (CIDR)', width: 120, cellType: text, fieldSuffix: cidr }
+      - { label: 'Prefix (CIDR)', width: 115, cellType: text, fieldSuffix: cidr }
       - label: 'Ownership'
-        width: 90
+        width: 108
         cellType: dropdown
         fieldSuffix: ownership
         options:
@@ -212,7 +212,7 @@ content:
           - { value: pa, label: 'PA (Assigned)' }
           - { value: leased, label: 'Leased' }
       - label: 'RPKI ROA'
-        width: 75
+        width: 59
         cellType: dropdown
         fieldSuffix: rpki
         options:
@@ -220,14 +220,14 @@ content:
           - { value: pending, label: 'Pending' }
           - { value: none, label: 'None' }
       - label: 'Protection'
-        width: 85
+        width: 80
         cellType: dropdown
         fieldSuffix: protection
         options:
           - { value: always_on, label: 'Always-On' }
           - { value: on_demand, label: 'On-Demand' }
       - label: 'Environment'
-        width: 100
+        width: 105
         cellType: dropdown
         fieldSuffix: environment
         options:
@@ -241,18 +241,18 @@ content:
     fieldPrefix: prefix_return
     rowCount: 8
     columns:
-      - { label: 'Prefix (CIDR)', width: 120, cellType: text, fieldSuffix: cidr }
+      - { label: 'Prefix (CIDR)', width: 125, cellType: text, fieldSuffix: cidr }
       - label: 'Return Method'
-        width: 110
+        width: 115
         cellType: dropdown
         fieldSuffix: method
         options:
           - { value: gre_tunnel, label: 'GRE Tunnel' }
           - { value: direct_routing, label: 'Direct Routing' }
           - { value: proxy_protocol, label: 'Proxy Protocol' }
-      - { label: 'GRE Endpoint IP', width: 120, cellType: text, fieldSuffix: gre_endpoint }
+      - { label: 'GRE Endpoint IP', width: 124, cellType: text, fieldSuffix: gre_endpoint }
       - label: 'LOA Status'
-        width: 90
+        width: 104
         cellType: dropdown
         fieldSuffix: loa
         options:
@@ -267,7 +267,7 @@ content:
     columns:
       - { label: 'Data Center', width: 100, cellType: text, fieldSuffix: datacenter }
       - label: 'Provider Type'
-        width: 90
+        width: 83
         cellType: dropdown
         fieldSuffix: provider
         options:
@@ -276,7 +276,7 @@ content:
           - { value: cloud, label: 'Cloud' }
       - { label: 'Router Name', width: 100, cellType: text, fieldSuffix: router_name }
       - label: 'Router Type'
-        width: 80
+        width: 75
         cellType: dropdown
         fieldSuffix: router_type
         options:
@@ -284,7 +284,7 @@ content:
           - { value: core, label: 'Core' }
           - { value: border, label: 'Border' }
       - label: 'Vendor'
-        width: 100
+        width: 110
         cellType: dropdown
         fieldSuffix: vendor
         options:
@@ -319,8 +319,8 @@ content:
   - type: table
     label: 'Bandwidth Metrics'
     columns:
-      - { label: 'Metric', width: 250, cellType: label }
-      - { label: 'Value (Mbps)', width: 150, cellType: text }
+      - { label: 'Metric', width: 240, cellType: label }
+      - { label: 'Value (Mbps)', width: 100, cellType: text }
     rows:
       - values: ['95th Percentile Inbound Bandwidth', 'bandwidth_95th']
       - values: ['Peak Inbound Bandwidth', 'bandwidth_peak']
@@ -329,8 +329,8 @@ content:
   - type: table
     label: 'Activation Method for On-Demand)'
     columns:
-      - { label: 'Method', width: 300, cellType: label }
-      - { label: 'Select', width: 80, cellType: checkbox }
+      - { label: 'Method', width: 240, cellType: label }
+      - { label: 'Select', width: 100, cellType: checkbox }
     rows:
       - values: ['Automatic (F5 detects attack and activates)', 'activation_automatic']
       - values: ['Manual (Customer initiates activation)', 'activation_manual']
@@ -341,7 +341,7 @@ content:
     fieldType: text
     fieldName: mitigation_time
     labelPosition: left
-    labelWidth: 200
+    labelWidth: 240
     width: 100
 
   - type: heading
@@ -412,8 +412,8 @@ content:
   - type: table
     label: 'Detection Methods'
     columns:
-      - { label: 'Detection Method', width: 350, cellType: label }
-      - { label: 'Select', width: 80, cellType: checkbox }
+      - { label: 'Detection Method', width: 240, cellType: label }
+      - { label: 'Select', width: 100, cellType: checkbox }
     rows:
       - values: ['Traffic analysis on edge routers (NetFlow/sFlow)', 'detect_netflow']
       - values: ['Inline detection (Always On mode)', 'detect_inline']
@@ -422,8 +422,8 @@ content:
   - type: table
     label: 'BGP Options'
     columns:
-      - { label: 'BGP Option', width: 300, cellType: label }
-      - { label: 'Select', width: 80, cellType: checkbox }
+      - { label: 'BGP Option', width: 240, cellType: label }
+      - { label: 'Select', width: 100, cellType: checkbox }
     rows:
       - values: ['Yes - Direct BGP peering', 'bgp_direct']
       - values: ['Yes - Through IX (Internet Exchange)', 'bgp_ix']
@@ -434,14 +434,14 @@ content:
     fieldPrefix: bgp
     rowCount: 8
     columns:
-      - { label: 'Peer Location', width: 200, cellType: text, fieldSuffix: peer_location }
-      - { label: 'Your Router IP', width: 200, cellType: text, fieldSuffix: router_ip }
+      - { label: 'Peer Location', width: 240, cellType: text, fieldSuffix: peer_location }
+      - { label: 'Your Router IP', width: 100, cellType: text, fieldSuffix: router_ip }
 
   - type: table
     label: 'GRE Tunnel Options'
     columns:
-      - { label: 'GRE Option', width: 300, cellType: label }
-      - { label: 'Select', width: 80, cellType: checkbox }
+      - { label: 'GRE Option', width: 240, cellType: label }
+      - { label: 'Select', width: 100, cellType: checkbox }
     rows:
       - values: ['Yes - GRE tunnels to our routers', 'gre_yes']
       - values: ['No - Direct routing', 'gre_no']
@@ -452,7 +452,7 @@ content:
     rowCount: 4
     columns:
       - label: 'Provider'
-        width: 225
+        width: 240
         cellType: dropdown
         fieldSuffix: provider
         options:
@@ -490,7 +490,7 @@ content:
     rowCount: 4
     columns:
       - label: 'Provider'
-        width: 225
+        width: 240
         cellType: dropdown
         fieldSuffix: provider
         options:
@@ -517,7 +517,7 @@ content:
   - type: table
     label: 'SLA Metrics'
     columns:
-      - { label: 'SLA Metric', width: 280, cellType: label }
+      - { label: 'SLA Metric', width: 240, cellType: label }
       - { label: 'Value', width: 100, cellType: text }
     rows:
       - values: ['Time to Detect (minutes)', 'sla_detect_time']
@@ -528,8 +528,8 @@ content:
   - type: table
     label: 'Reporting Options'
     columns:
-      - { label: 'Report Type', width: 174, cellType: label }
-      - { label: 'Select', width: 60, cellType: checkbox }
+      - { label: 'Report Type', width: 240, cellType: label }
+      - { label: 'Select', width: 100, cellType: checkbox }
     rows:
       - values: ['Real-time attack dashboard', 'report_realtime']
       - values: ['Monthly summary reports', 'report_monthly']
@@ -542,7 +542,7 @@ content:
     fieldName: support_level
     labelPosition: left
     labelWidth: 100
-    width: 250
+    width: 240
     options:
       - { value: standard, label: 'Standard - Business hours' }
       - { value: enhanced, label: 'Enhanced - 24x7 SOC' }
@@ -551,8 +551,8 @@ content:
   - type: table
     label: 'Alerts'
     columns:
-      - { label: 'Method', width: 180, cellType: label }
-      - { label: 'Select', width: 60, cellType: checkbox }
+      - { label: 'Method', width: 240, cellType: label }
+      - { label: 'Select', width: 100, cellType: checkbox }
     rows:
       - values: ['Email alerts', 'alert_email']
       - values: ['Webhook/API integration', 'alert_webhook']

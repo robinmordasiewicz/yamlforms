@@ -6,7 +6,20 @@
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import { dirname } from 'path';
 import { existsSync } from 'fs';
-import type { ParsedFormSchema, NormalizedFormField, HtmlConfig } from '../../types/index.js';
+import type {
+  ParsedFormSchema,
+  NormalizedFormField,
+  HtmlConfig,
+  SchemaContentElement,
+  HeadingContent,
+  ParagraphContent,
+  FieldContent,
+  TableContent,
+  AdmonitionContent,
+  SpacerContent,
+  TableColumn,
+  FieldOption,
+} from '../../types/index.js';
 import { DEFAULT_CONFIG } from '../../types/index.js';
 import type { ParsedMarkdown } from '../../parsers/index.js';
 
@@ -54,7 +67,7 @@ function generateDefaultHtml(
   schema: ParsedFormSchema | null | undefined,
   config: Required<HtmlConfig>
 ): string {
-  const title = markdown?.title || schema?.form.title || 'Document';
+  const title = markdown?.title ?? schema?.form.title ?? 'Document';
 
   let styles = '';
   if (config.embedStyles) {
@@ -73,7 +86,14 @@ function generateDefaultHtml(
   }
 
   const formHtml = schema ? generateFormHtml(schema) : '';
-  const contentHtml = markdown?.html || '';
+  // Use schema content if available, otherwise fall back to markdown HTML
+  const contentHtml =
+    schema?.content && schema.content.length > 0
+      ? generateContentHtml(schema)
+      : (markdown?.html ?? '');
+
+  // If schema has content, don't wrap in form - content includes its own fields
+  const hasSchemaContent = schema?.content && schema.content.length > 0;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -91,12 +111,20 @@ function generateDefaultHtml(
     </header>
 
     <main>
-      ${contentHtml}
-
+      ${
+        hasSchemaContent
+          ? `<form id="form-${schema?.form.id ?? 'main'}" class="schema-content-form">
+          ${contentHtml}
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+          </div>
+        </form>`
+          : `${contentHtml}
       ${
         formHtml
           ? `
-      <form id="form-${schema?.form.id || 'main'}" class="form">
+      <form id="form-${schema?.form.id ?? 'main'}" class="form">
         ${formHtml}
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Submit</button>
@@ -105,6 +133,7 @@ function generateDefaultHtml(
       </form>
       `
           : ''
+      }`
       }
     </main>
 
@@ -118,6 +147,300 @@ function generateDefaultHtml(
 }
 
 /**
+ * Generate HTML from schema content elements
+ */
+function generateContentHtml(schema: ParsedFormSchema): string {
+  if (!schema.content || schema.content.length === 0) {
+    return '';
+  }
+
+  let fieldNumber = 0;
+  const enableNumbering = schema.form.numbering === true;
+
+  return schema.content
+    .map((element) => renderContentElement(element, enableNumbering, () => ++fieldNumber))
+    .join('\n');
+}
+
+/**
+ * Render a single content element to HTML
+ */
+function renderContentElement(
+  element: SchemaContentElement,
+  enableNumbering: boolean,
+  getFieldNumber: () => number
+): string {
+  switch (element.type) {
+    case 'heading':
+      return renderHeading(element);
+    case 'paragraph':
+      return renderParagraph(element);
+    case 'rule':
+      return renderRule();
+    case 'field':
+      return renderInlineField(element, enableNumbering, getFieldNumber);
+    case 'table':
+      return renderTable(element);
+    case 'admonition':
+      return renderAdmonition(element);
+    case 'spacer':
+      return renderSpacer(element);
+    default:
+      return `<!-- Unknown content type: ${(element as SchemaContentElement).type} -->`;
+  }
+}
+
+function renderHeading(element: HeadingContent): string {
+  const level = element.level ?? 2;
+  return `<h${level}>${escapeHtml(element.text)}</h${level}>`;
+}
+
+function renderParagraph(element: ParagraphContent): string {
+  const style = element.maxWidth ? ` style="max-width: ${element.maxWidth}px"` : '';
+  return `<p${style}>${escapeHtml(element.text)}</p>`;
+}
+
+function renderRule(): string {
+  return '<hr class="content-rule" />';
+}
+
+function renderSpacer(element: SpacerContent): string {
+  return `<div class="spacer" style="height: ${element.height}px"></div>`;
+}
+
+function renderAdmonition(element: AdmonitionContent): string {
+  const variantClass = `admonition-${element.variant}`;
+  return `
+    <div class="admonition ${variantClass}">
+      <div class="admonition-title">${escapeHtml(element.title)}</div>
+      <div class="admonition-content">${escapeHtml(element.text)}</div>
+    </div>`;
+}
+
+function renderInlineField(
+  element: FieldContent,
+  enableNumbering: boolean,
+  getFieldNumber: () => number
+): string {
+  const labelPosition = element.labelPosition ?? 'above';
+  const label = enableNumbering
+    ? `${getFieldNumber()}. ${element.label ?? ''}`
+    : (element.label ?? '');
+
+  const containerClass =
+    labelPosition === 'left' ? 'inline-field inline-field-horizontal' : 'inline-field';
+  const labelStyle =
+    labelPosition === 'left' && element.labelWidth
+      ? ` style="width: ${element.labelWidth}px; min-width: ${element.labelWidth}px"`
+      : '';
+  const fieldStyle = element.width ? ` style="width: ${element.width}px"` : '';
+
+  let fieldHtml = '';
+
+  switch (element.fieldType) {
+    case 'text':
+      fieldHtml = `<input type="text" id="${element.fieldName}" name="${element.fieldName}"
+        ${element.placeholder ? `placeholder="${escapeHtml(element.placeholder)}"` : ''}
+        ${element.default ? `value="${escapeHtml(String(element.default))}"` : ''}
+        ${element.required ? 'required' : ''}${fieldStyle}>`;
+      break;
+
+    case 'textarea': {
+      const textareaStyle =
+        (element.width ?? element.height)
+          ? ` style="${element.width ? `width: ${element.width}px;` : ''}${element.height ? `height: ${element.height}px;` : ''}"`
+          : '';
+      fieldHtml = `<textarea id="${element.fieldName}" name="${element.fieldName}"
+        ${element.placeholder ? `placeholder="${escapeHtml(element.placeholder)}"` : ''}
+        ${element.required ? 'required' : ''}${textareaStyle}>${element.default ? escapeHtml(String(element.default)) : ''}</textarea>`;
+      break;
+    }
+
+    case 'checkbox':
+      fieldHtml = `<input type="checkbox" id="${element.fieldName}" name="${element.fieldName}"
+        ${element.default === true ? 'checked' : ''}>`;
+      break;
+
+    case 'dropdown': {
+      const options = (element.options ?? [])
+        .map((opt: FieldOption | string) => {
+          const optValue = typeof opt === 'string' ? opt : opt.value;
+          const optLabel = typeof opt === 'string' ? opt : opt.label;
+          const selected = element.default === optValue ? ' selected' : '';
+          return `<option value="${escapeHtml(optValue)}"${selected}>${escapeHtml(optLabel)}</option>`;
+        })
+        .join('\n          ');
+      fieldHtml = `<select id="${element.fieldName}" name="${element.fieldName}"
+        ${element.required ? 'required' : ''}${fieldStyle}>
+          <option value="">-- Select --</option>
+          ${options}
+        </select>`;
+      break;
+    }
+  }
+
+  return `
+    <div class="${containerClass}">
+      <label for="${element.fieldName}"${labelStyle}>${escapeHtml(label)}</label>
+      ${fieldHtml}
+    </div>`;
+}
+
+function renderTable(element: TableContent): string {
+  const columns = element.columns;
+  const rows = generateTableRows(element);
+
+  const tableLabel = element.label
+    ? `<div class="table-label">${escapeHtml(element.label)}</div>`
+    : '';
+
+  // Generate header row
+  const headerCells = columns
+    .map((col) => `<th style="width: ${col.width}px">${escapeHtml(col.label)}</th>`)
+    .join('');
+  const headerRow = `<tr>${headerCells}</tr>`;
+
+  // Generate data rows
+  const dataRows = rows
+    .map((row) => {
+      const cells = row
+        .map((cell, colIdx) => {
+          const col = columns[colIdx];
+          return `<td>${renderTableCell(cell, col)}</td>`;
+        })
+        .join('');
+      return `<tr>${cells}</tr>`;
+    })
+    .join('\n');
+
+  return `
+    ${tableLabel}
+    <table class="content-table">
+      <thead>${headerRow}</thead>
+      <tbody>${dataRows}</tbody>
+    </table>`;
+}
+
+interface TableCellData {
+  type: 'label' | 'text' | 'dropdown' | 'checkbox';
+  value?: string;
+  fieldName?: string;
+  options?: FieldOption[];
+  default?: string | boolean;
+}
+
+function generateTableRows(element: TableContent): TableCellData[][] {
+  const columns = element.columns;
+  const rows: TableCellData[][] = [];
+
+  // If rowCount is specified, generate rows from column definitions
+  if (element.rowCount && element.fieldPrefix) {
+    for (let rowIdx = 1; rowIdx <= element.rowCount; rowIdx++) {
+      const row: TableCellData[] = columns.map((col) => {
+        const cellType = col.cellType ?? 'text';
+        const prefix = element.fieldPrefix ?? 'table';
+        const fieldName = col.fieldSuffix
+          ? `${prefix}_${rowIdx}_${col.fieldSuffix}`
+          : `${prefix}_${rowIdx}_${(col.label ?? '').toLowerCase().replace(/\s+/g, '_')}`;
+
+        if (cellType === 'label') {
+          return { type: 'label', value: '' };
+        }
+
+        return {
+          type: cellType,
+          fieldName,
+          options: col.options,
+        };
+      });
+      rows.push(row);
+    }
+  }
+
+  // If explicit rows are defined
+  if (element.rows) {
+    for (const row of element.rows) {
+      if (row.cells) {
+        // Full cell definitions
+        const cellData: TableCellData[] = row.cells.map((cell) => {
+          if (cell.type === 'label') {
+            return { type: 'label', value: cell.value };
+          }
+          return {
+            type: cell.type,
+            fieldName: cell.fieldName,
+            options: cell.options,
+            default: cell.default,
+          };
+        });
+        rows.push(cellData);
+      } else if (row.values) {
+        // Compact format: values array
+        const cellData: TableCellData[] = row.values.map((val, colIdx) => {
+          const col = columns[colIdx];
+          // Handle case where values exceed column count (skip extra values)
+          if (!col) {
+            return { type: 'text' as const, fieldName: String(val) };
+          }
+          const cellType = col.cellType ?? 'text';
+
+          if (cellType === 'label') {
+            return { type: 'label' as const, value: String(val) };
+          }
+
+          // For non-label cells, the value is the fieldName
+          return {
+            type: cellType,
+            fieldName: String(val),
+            options: col.options,
+          };
+        });
+        rows.push(cellData);
+      }
+    }
+  }
+
+  return rows;
+}
+
+function renderTableCell(cell: TableCellData, _col: TableColumn): string {
+  switch (cell.type) {
+    case 'label':
+      return escapeHtml(cell.value ?? '');
+
+    case 'text': {
+      const fieldName = cell.fieldName ?? '';
+      const defaultValue = cell.default ? `value="${escapeHtml(String(cell.default))}"` : '';
+      return `<input type="text" name="${fieldName}" class="table-input"
+        ${defaultValue}>`;
+    }
+
+    case 'checkbox': {
+      const fieldName = cell.fieldName ?? '';
+      return `<input type="checkbox" name="${fieldName}"
+        ${cell.default === true ? 'checked' : ''}>`;
+    }
+
+    case 'dropdown': {
+      const fieldName = cell.fieldName ?? '';
+      const options = (cell.options ?? [])
+        .map((opt) => {
+          const selected = cell.default === opt.value ? ' selected' : '';
+          return `<option value="${escapeHtml(opt.value)}"${selected}>${escapeHtml(opt.label)}</option>`;
+        })
+        .join('');
+      return `<select name="${fieldName}" class="table-select">
+        <option value="">--</option>
+        ${options}
+      </select>`;
+    }
+
+    default:
+      return '';
+  }
+}
+
+/**
  * Generate HTML for form fields
  */
 function generateFormHtml(schema: ParsedFormSchema): string {
@@ -125,7 +448,7 @@ function generateFormHtml(schema: ParsedFormSchema): string {
 
   // Group fields by page
   for (const field of schema.fields) {
-    const pageFields = fieldsByPage.get(field.page) || [];
+    const pageFields = fieldsByPage.get(field.page) ?? [];
     pageFields.push(field);
     fieldsByPage.set(field.page, pageFields);
   }
@@ -446,6 +769,180 @@ function getDefaultStyles(): string {
       font-size: 0.875rem;
     }
 
+    /* Schema content styles */
+    .schema-content-form {
+      margin-top: 1rem;
+    }
+
+    .content-rule {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 1.5rem 0;
+    }
+
+    .spacer {
+      display: block;
+    }
+
+    /* Inline field styles */
+    .inline-field {
+      margin-bottom: 1rem;
+    }
+
+    .inline-field label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .inline-field-horizontal {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .inline-field-horizontal label {
+      display: inline-block;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+
+    .inline-field input[type="text"],
+    .inline-field select,
+    .inline-field textarea {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .inline-field select {
+      min-width: 120px;
+    }
+
+    /* Content table styles */
+    .table-label {
+      font-weight: 600;
+      margin: 1.5rem 0 0.5rem 0;
+      color: #333;
+    }
+
+    .content-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .content-table th,
+    .content-table td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+
+    .content-table th {
+      background-color: #f5f5f5;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .content-table td {
+      vertical-align: middle;
+    }
+
+    .table-input {
+      width: 100%;
+      padding: 0.375rem 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+    }
+
+    .table-input:focus {
+      outline: none;
+      border-color: #0066cc;
+    }
+
+    .table-select {
+      width: 100%;
+      padding: 0.375rem 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    .table-select:focus {
+      outline: none;
+      border-color: #0066cc;
+    }
+
+    /* Admonition styles */
+    .admonition {
+      border-radius: 4px;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-left: 4px solid;
+    }
+
+    .admonition-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .admonition-content {
+      font-size: 0.95rem;
+    }
+
+    .admonition-info {
+      background-color: #e7f3ff;
+      border-color: #0066cc;
+    }
+
+    .admonition-info .admonition-title {
+      color: #0066cc;
+    }
+
+    .admonition-warning {
+      background-color: #fff8e6;
+      border-color: #f0a000;
+    }
+
+    .admonition-warning .admonition-title {
+      color: #b07800;
+    }
+
+    .admonition-note {
+      background-color: #f0f0f0;
+      border-color: #666;
+    }
+
+    .admonition-note .admonition-title {
+      color: #333;
+    }
+
+    .admonition-tip {
+      background-color: #e6f7e6;
+      border-color: #28a745;
+    }
+
+    .admonition-tip .admonition-title {
+      color: #1e7e34;
+    }
+
+    .admonition-danger {
+      background-color: #ffebee;
+      border-color: #dc3545;
+    }
+
+    .admonition-danger .admonition-title {
+      color: #c82333;
+    }
+
     @media print {
       body {
         background: white;
@@ -455,6 +952,9 @@ function getDefaultStyles(): string {
       }
       .form-actions {
         display: none;
+      }
+      .content-table {
+        page-break-inside: avoid;
       }
     }
   `;

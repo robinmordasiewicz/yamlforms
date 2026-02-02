@@ -9,7 +9,7 @@ form:
   version: '1.0.0'
   description: Test schema for table content type
   pages: 1
-  positioning: absolute
+  positioning: flow
 
 content:
   - type: heading
