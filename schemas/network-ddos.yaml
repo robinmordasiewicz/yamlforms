@@ -1,13 +1,9 @@
-# DDoS Protection Sizing - Complete Schema
-# Single-file source of truth with all content in flow mode
-# All form fields are embedded in tables within the content section
-# Uses simplified table schema for DRY (Don't Repeat Yourself) definitions
-
+---
 $schema: '../schemas/form-schema.json'
 
 form:
   id: network-ddos
-  title: Network DDoS Protection Questionnaire
+  title: Network DDoS
   version: '1.0.0'
   author: Robin Mordasiewicz
   description: Complete DDoS Protection requirements assessment form with content
