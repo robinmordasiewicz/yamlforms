@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * yamldocs CLI
+ * yamlforms CLI
  * Generate fillable PDF forms from YAML schemas
  */
 
@@ -69,7 +69,7 @@ function getVersion(): string {
 const program = new Command();
 
 program
-  .name('yamldocs')
+  .name('yamlforms')
   .description('Generate fillable PDF forms from YAML schemas')
   .version(getVersion());
 
@@ -217,7 +217,7 @@ program
 // Init command (scaffolds a new project)
 program
   .command('init')
-  .description('Initialize a new yamldocs project')
+  .description('Initialize a new yamlforms project')
   .argument('[directory]', 'Directory to initialize', '.')
   .action(async (directory: string) => {
     try {

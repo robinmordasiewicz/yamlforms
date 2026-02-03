@@ -244,7 +244,7 @@ async function runGenerate(inputs) {
 export async function run() {
     try {
         const inputs = getInputs();
-        core.info('🚀 yamldocs GitHub Action');
+        core.info('🚀 yamlforms GitHub Action');
         core.info(`   Command: ${inputs.command}`);
         switch (inputs.command) {
             case 'validate':

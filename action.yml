@@ -1,4 +1,4 @@
-name: 'yamldocs'
+name: 'yamlforms'
 description: 'Generate fillable PDF forms with AcroForm fields from YAML schemas'
 author: 'robinmordasiewicz'
 

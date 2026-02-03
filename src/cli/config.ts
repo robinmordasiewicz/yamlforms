@@ -11,13 +11,13 @@ import type { Config, GenerateOptions } from '../types/index.js';
 import { DEFAULT_CONFIG as DEFAULTS } from '../types/index.js';
 
 const CONFIG_FILENAMES = [
-  'yamldocs.config.yaml',
-  'yamldocs.config.yml',
-  'yamldocs.config.json',
-  '.yamldocsrc',
-  '.yamldocsrc.yaml',
-  '.yamldocsrc.yml',
-  '.yamldocsrc.json',
+  'yamlforms.config.yaml',
+  'yamlforms.config.yml',
+  'yamlforms.config.json',
+  '.yamlformsrc',
+  '.yamlformsrc.yaml',
+  '.yamlformsrc.yml',
+  '.yamlformsrc.json',
 ];
 
 /**

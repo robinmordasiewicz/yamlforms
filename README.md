@@ -1,8 +1,8 @@
-# yamldocs
+# yamlforms
 
 Generate fillable PDF forms with interactive AcroForm fields from YAML schema definitions.
 
-[![npm version](https://img.shields.io/npm/v/yamldocs.svg)](https://www.npmjs.com/package/yamldocs)
+[![npm version](https://img.shields.io/npm/v/yamlforms.svg)](https://www.npmjs.com/package/yamlforms)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -20,7 +20,7 @@ Generate fillable PDF forms with interactive AcroForm fields from YAML schema de
 ## Installation
 
 ```bash
-npm install -g yamldocs
+npm install -g yamlforms
 ```
 
 **Requirements:** Node.js 24+
@@ -29,17 +29,17 @@ npm install -g yamldocs
 
 ```bash
 # Initialize a new project
-yamldocs init my-forms
+yamlforms init my-forms
 cd my-forms
 
 # Generate PDF from schema
-yamldocs generate schemas/sample.yaml --output dist
+yamlforms generate schemas/sample.yaml --output dist
 
 # Generate both PDF and HTML
-yamldocs generate schemas/sample.yaml --format pdf,html
+yamlforms generate schemas/sample.yaml --format pdf,html
 
 # Watch for changes
-yamldocs generate schemas/sample.yaml --watch
+yamlforms generate schemas/sample.yaml --watch
 ```
 
 ## CLI Commands
@@ -49,7 +49,7 @@ yamldocs generate schemas/sample.yaml --watch
 Generate documents from a YAML schema.
 
 ```bash
-yamldocs generate <schema> [options]
+yamlforms generate <schema> [options]
 
 Options:
   -o, --output <dir>      Output directory (default: current directory)
@@ -63,7 +63,7 @@ Options:
 Validate a schema file against the JSON schema.
 
 ```bash
-yamldocs validate <schema> [options]
+yamlforms validate <schema> [options]
 
 Options:
   -v, --verbose  Show detailed validation info
@@ -74,7 +74,7 @@ Options:
 Preview form fields without generating files.
 
 ```bash
-yamldocs preview <schema> [options]
+yamlforms preview <schema> [options]
 
 Options:
   -f, --format <format>  Output format: table, json, yaml (default: table)
@@ -85,17 +85,17 @@ Options:
 Initialize a new project with sample files.
 
 ```bash
-yamldocs init [directory]
+yamlforms init [directory]
 ```
 
 ## GitHub Action
 
-Use yamldocs in your CI/CD workflows to generate PDF forms automatically.
+Use yamlforms in your CI/CD workflows to generate PDF forms automatically.
 
 ### Basic Usage
 
 ```yaml
-- uses: robinmordasiewicz/yamldocs@v1
+- uses: robinmordasiewicz/yamlforms@v1
   with:
     schema: 'schemas/my-form.yaml'
     output: 'dist'
@@ -125,7 +125,7 @@ Use yamldocs in your CI/CD workflows to generate PDF forms automatically.
 **Generate PDF and HTML:**
 
 ```yaml
-- uses: robinmordasiewicz/yamldocs@v1
+- uses: robinmordasiewicz/yamlforms@v1
   with:
     schema: 'schemas/*.yaml'
     output: 'dist/forms'
@@ -135,7 +135,7 @@ Use yamldocs in your CI/CD workflows to generate PDF forms automatically.
 **Validate schemas in PRs:**
 
 ```yaml
-- uses: robinmordasiewicz/yamldocs@v1
+- uses: robinmordasiewicz/yamlforms@v1
   with:
     command: validate
     schema: 'schemas/**/*.yaml'
@@ -144,8 +144,8 @@ Use yamldocs in your CI/CD workflows to generate PDF forms automatically.
 **Upload generated files as artifacts:**
 
 ```yaml
-- uses: robinmordasiewicz/yamldocs@v1
-  id: yamldocs
+- uses: robinmordasiewicz/yamlforms@v1
+  id: yamlforms
   with:
     schema: 'schemas/order-form.yaml'
     output: 'dist'
@@ -388,8 +388,8 @@ The default stylesheet follows accessibility standards (WCAG 2.1 AA, ISO 9241-11
 
 ```bash
 # Clone and install
-git clone https://github.com/robinmordasiewicz/yamldocs.git
-cd yamldocs
+git clone https://github.com/robinmordasiewicz/yamlforms.git
+cd yamlforms
 npm install
 
 # Build

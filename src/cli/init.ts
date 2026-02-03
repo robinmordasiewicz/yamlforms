@@ -1,6 +1,6 @@
 /**
  * Project Initialization
- * Scaffolds a new yamldocs project
+ * Scaffolds a new yamlforms project
  */
 
 import { mkdir, writeFile } from 'fs/promises';
@@ -8,7 +8,7 @@ import { existsSync } from 'fs';
 import { resolve, join } from 'path';
 import chalk from 'chalk';
 
-const SAMPLE_CONFIG = `# yamldocs Configuration
+const SAMPLE_CONFIG = `# yamlforms Configuration
 input:
   schemas: "./schemas"
   styles: "./styles"
@@ -121,7 +121,7 @@ Thumbs.db
 export async function initProject(directory: string): Promise<void> {
   const targetDir = resolve(directory);
 
-  console.log(chalk.cyan('Initializing yamldocs project...'));
+  console.log(chalk.cyan('Initializing yamlforms project...'));
   console.log('');
 
   // Create directories
@@ -140,7 +140,7 @@ export async function initProject(directory: string): Promise<void> {
   // Create files
   const files = [
     {
-      path: 'yamldocs.config.yaml',
+      path: 'yamlforms.config.yaml',
       content: SAMPLE_CONFIG,
     },
     {
@@ -168,6 +168,6 @@ export async function initProject(directory: string): Promise<void> {
   console.log('');
   console.log('Next steps:');
   console.log(chalk.gray('  1. Edit schemas/sample-form.yaml to define your form'));
-  console.log(chalk.gray('  2. Run: yamldocs generate schemas/sample-form.yaml'));
+  console.log(chalk.gray('  2. Run: yamlforms generate schemas/sample-form.yaml'));
   console.log('');
 }

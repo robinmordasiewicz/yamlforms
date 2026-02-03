@@ -315,7 +315,7 @@ export async function run(): Promise<void> {
   try {
     const inputs = getInputs();
 
-    core.info('🚀 yamldocs GitHub Action');
+    core.info('🚀 yamlforms GitHub Action');
     core.info(`   Command: ${inputs.command}`);
 
     switch (inputs.command) {
