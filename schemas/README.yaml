@@ -1,0 +1,648 @@
+---
+# =============================================================================
+# YAMLFORMS COMPREHENSIVE SCHEMA REFERENCE
+# =============================================================================
+# This file demonstrates EVERY available option in the yamlforms schema.
+# Use it as a reference when creating your own form schemas.
+#
+# Generate with: yamlforms generate schemas/README.yaml --format pdf,html
+# =============================================================================
+
+$schema: 'form-schema/v1'
+
+# =============================================================================
+# FORM CONFIGURATION
+# =============================================================================
+# All top-level form settings and metadata
+form:
+  # REQUIRED: Unique identifier (alphanumeric, underscore, hyphen)
+  id: yamlforms-reference
+
+  # REQUIRED: Form title displayed in the document
+  title: 'YAMLForms Complete Reference Guide'
+
+  # Optional: Semantic version
+  version: '1.0.0'
+
+  # Optional: Form author
+  author: 'YAMLForms Documentation'
+
+  # Optional: Form description
+  description: 'Comprehensive demonstration of all yamlforms schema options'
+
+  # Optional: Number of pages (default: 1)
+  # In flow mode, pages are created automatically as content overflows
+  pages: 5
+
+  # Optional: Positioning mode (default: flow)
+  # 'flow' - Content elements stack vertically, automatic page breaks
+  positioning: flow
+
+  # Optional: Auto-number standalone field labels (1., 2., 3., etc.)
+  numbering: true
+
+  # Optional: Path to custom CSS stylesheet for PDF styling
+  # stylesheet: './custom-styles.css'
+
+# =============================================================================
+# CONTENT ELEMENTS
+# =============================================================================
+# Content elements define the structure and layout of your form.
+# In flow mode, elements are rendered top-to-bottom, left-to-right.
+content:
+  # ---------------------------------------------------------------------------
+  # HEADING
+  # ---------------------------------------------------------------------------
+  # Headings create section titles. Levels 1-6 are supported.
+  - type: heading
+    level: 1
+    text: '1. Content Elements'
+
+  - type: heading
+    level: 2
+    text: '1.1 Headings'
+
+  - type: paragraph
+    text: 'Headings support levels 1 through 6, similar to HTML h1-h6 tags.'
+
+  - type: heading
+    level: 3
+    text: 'Level 3 Heading Example'
+
+  - type: heading
+    level: 4
+    text: 'Level 4 Heading Example'
+
+  # ---------------------------------------------------------------------------
+  # PARAGRAPH
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '1.2 Paragraphs'
+
+  - type: paragraph
+    text: 'Paragraphs display body text. They support optional maxWidth and fontSize properties for fine-tuned control over text presentation.'
+
+  - type: paragraph
+    text: 'This paragraph has a custom maximum width of 400 points and a larger font size of 14 points.'
+    maxWidth: 400
+    fontSize: 14
+
+  # ---------------------------------------------------------------------------
+  # RULE (Horizontal Line)
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '1.3 Rules'
+
+  - type: paragraph
+    text: 'Rules create horizontal dividing lines between content sections.'
+
+  - type: rule
+
+  # ---------------------------------------------------------------------------
+  # SPACER
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '1.4 Spacers'
+
+  - type: paragraph
+    text: 'Spacers add vertical whitespace. Height is specified in points.'
+
+  - type: spacer
+    height: 24
+
+  - type: paragraph
+    text: '(24 points of space was added above this paragraph)'
+
+  # ---------------------------------------------------------------------------
+  # ADMONITIONS
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '1.5 Admonitions'
+
+  - type: paragraph
+    text: 'Admonitions are callout boxes for important information. Five variants are available.'
+
+  - type: admonition
+    variant: note
+    title: 'Note'
+    text: 'Use notes for supplementary information that adds context.'
+
+  - type: admonition
+    variant: info
+    title: 'Information'
+    text: 'Info boxes highlight general helpful information.'
+
+  - type: admonition
+    variant: tip
+    title: 'Tip'
+    text: 'Tips provide helpful suggestions and best practices.'
+
+  - type: admonition
+    variant: warning
+    title: 'Warning'
+    text: 'Warnings alert users to potential issues or important considerations.'
+
+  - type: admonition
+    variant: danger
+    title: 'Danger'
+    text: 'Danger boxes indicate critical warnings that require immediate attention.'
+
+  # ---------------------------------------------------------------------------
+  # STANDALONE FIELDS IN CONTENT
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 1
+    text: '2. Form Fields'
+
+  - type: heading
+    level: 2
+    text: '2.1 Text Fields'
+
+  - type: paragraph
+    text: 'Single-line text input fields with optional placeholder and validation.'
+
+  # Basic text field
+  - type: field
+    label: 'Full Name'
+    fieldType: text
+    fieldName: full_name
+    required: true
+    placeholder: 'Enter your full name'
+
+  # Text field with custom width
+  - type: field
+    label: 'Email Address'
+    fieldType: text
+    fieldName: email
+    width: 300
+    placeholder: 'user@example.com'
+    required: true
+
+  # Text field with label on the left
+  - type: field
+    label: 'Phone Number'
+    fieldType: text
+    fieldName: phone
+    labelPosition: left
+    labelWidth: 120
+    width: 200
+    placeholder: '(555) 123-4567'
+
+  # ---------------------------------------------------------------------------
+  # TEXTAREA (Multi-line Text)
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '2.2 Textarea Fields'
+
+  - type: paragraph
+    text: 'Multi-line text areas for longer content like descriptions or comments.'
+
+  - type: field
+    label: 'Additional Comments'
+    fieldType: textarea
+    fieldName: comments
+    width: 450
+    height: 80
+    placeholder: 'Enter any additional information here...'
+
+  # ---------------------------------------------------------------------------
+  # CHECKBOX
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '2.3 Checkbox Fields'
+
+  - type: paragraph
+    text: 'Boolean checkbox fields for yes/no selections.'
+
+  - type: field
+    label: 'I agree to the terms and conditions'
+    fieldType: checkbox
+    fieldName: agree_terms
+    required: true
+
+  - type: field
+    label: 'Subscribe to newsletter'
+    fieldType: checkbox
+    fieldName: newsletter
+    default: true
+
+  # ---------------------------------------------------------------------------
+  # DROPDOWN
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '2.4 Dropdown Fields'
+
+  - type: paragraph
+    text: 'Dropdown select fields with predefined options.'
+
+  # Dropdown with simple string options
+  - type: field
+    label: 'Preferred Contact Method'
+    fieldType: dropdown
+    fieldName: contact_method
+    width: 200
+    options:
+      - 'Email'
+      - 'Phone'
+      - 'Mail'
+
+  # Dropdown with value/label pairs
+  - type: field
+    label: 'Country'
+    fieldType: dropdown
+    fieldName: country
+    width: 250
+    default: 'us'
+    options:
+      - value: 'us'
+        label: 'United States'
+      - value: 'ca'
+        label: 'Canada'
+      - value: 'uk'
+        label: 'United Kingdom'
+      - value: 'au'
+        label: 'Australia'
+      - value: 'other'
+        label: 'Other'
+
+  # ---------------------------------------------------------------------------
+  # TABLES WITH FORM FIELDS
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 1
+    text: '3. Tables'
+
+  - type: heading
+    level: 2
+    text: '3.1 Basic Table with Manual Rows'
+
+  - type: paragraph
+    text: 'Tables can contain form fields in cells. Define columns and rows explicitly.'
+
+  - type: table
+    label: 'Contact Information'
+    columns:
+      - label: 'Name'
+        width: 150
+      - label: 'Email'
+        width: 180
+      - label: 'Phone'
+        width: 120
+      - label: 'Primary'
+        width: 60
+    rows:
+      - cells:
+          - type: text
+            fieldName: contact1_name
+          - type: text
+            fieldName: contact1_email
+          - type: text
+            fieldName: contact1_phone
+          - type: checkbox
+            fieldName: contact1_primary
+            default: true
+      - cells:
+          - type: text
+            fieldName: contact2_name
+          - type: text
+            fieldName: contact2_email
+          - type: text
+            fieldName: contact2_phone
+          - type: checkbox
+            fieldName: contact2_primary
+
+  # ---------------------------------------------------------------------------
+  # TABLE WITH AUTO-GENERATED ROWS
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '3.2 Auto-Generated Table Rows'
+
+  - type: paragraph
+    text: 'Use rowCount with fieldPrefix and fieldSuffix for automatic row generation.'
+
+  - type: table
+    label: 'Line Items'
+    fieldPrefix: item
+    rowCount: 5
+    rowHeight: 24
+    headerHeight: 28
+    showBorders: true
+    columns:
+      - label: 'Description'
+        width: 200
+        cellType: text
+        fieldSuffix: desc
+      - label: 'Quantity'
+        width: 80
+        cellType: text
+        fieldSuffix: qty
+      - label: 'Unit Price'
+        width: 100
+        cellType: text
+        fieldSuffix: price
+      - label: 'Taxable'
+        width: 60
+        cellType: checkbox
+        fieldSuffix: tax
+
+  # ---------------------------------------------------------------------------
+  # TABLE WITH DROPDOWN COLUMNS
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '3.3 Table with Dropdown Options'
+
+  - type: table
+    label: 'Team Assignments'
+    columns:
+      - label: 'Team Member'
+        width: 150
+        cellType: text
+      - label: 'Role'
+        width: 120
+        cellType: dropdown
+        options:
+          - 'Developer'
+          - 'Designer'
+          - 'Manager'
+          - 'QA'
+      - label: 'Status'
+        width: 100
+        cellType: dropdown
+        options:
+          - value: 'active'
+            label: 'Active'
+          - value: 'vacation'
+            label: 'On Vacation'
+          - value: 'leave'
+            label: 'On Leave'
+    fieldPrefix: team
+    rowCount: 3
+
+  # ---------------------------------------------------------------------------
+  # TABLE WITH STATIC LABELS
+  # ---------------------------------------------------------------------------
+  - type: heading
+    level: 2
+    text: '3.4 Table with Static Labels'
+
+  - type: table
+    label: 'Product Specifications'
+    columns:
+      - label: 'Specification'
+        width: 150
+      - label: 'Value'
+        width: 200
+    rows:
+      - cells:
+          - type: label
+            value: 'Model Number'
+          - type: text
+            fieldName: spec_model
+      - cells:
+          - type: label
+            value: 'Serial Number'
+          - type: text
+            fieldName: spec_serial
+      - cells:
+          - type: label
+            value: 'Warranty Status'
+          - type: dropdown
+            fieldName: spec_warranty
+            options:
+              - 'Active'
+              - 'Expired'
+              - 'Extended'
+
+# =============================================================================
+# LEGACY POSITIONED FIELDS
+# =============================================================================
+# The 'fields' array supports absolute positioning for precise layout control.
+# This is useful when you need exact placement on specific pages.
+fields:
+  # ---------------------------------------------------------------------------
+  # TEXT FIELD with full options
+  # ---------------------------------------------------------------------------
+  - name: legacy_text
+    type: text
+    label: 'Legacy Text Field'
+    page: 5
+    required: true
+    placeholder: 'Positioned at exact coordinates'
+    maxLength: 100
+    fontSize: 11
+    fontColor: '#333333'
+    backgroundColor: '#FFFFFF'
+    borderColor: '#CCCCCC'
+    position:
+      x: 72
+      y: 650
+      width: 200
+      height: 24
+
+  # ---------------------------------------------------------------------------
+  # RADIO BUTTON GROUP
+  # ---------------------------------------------------------------------------
+  - name: priority_level
+    type: radio
+    label: 'Priority Level'
+    page: 5
+    options:
+      - value: 'low'
+        label: 'Low Priority'
+      - value: 'medium'
+        label: 'Medium Priority'
+      - value: 'high'
+        label: 'High Priority'
+      - value: 'urgent'
+        label: 'Urgent'
+    default: 'medium'
+    position:
+      x: 300
+      y: 650
+
+  # ---------------------------------------------------------------------------
+  # SIGNATURE FIELD
+  # ---------------------------------------------------------------------------
+  - name: applicant_signature
+    type: signature
+    label: 'Applicant Signature'
+    page: 5
+    required: true
+    position:
+      x: 72
+      y: 500
+      width: 200
+      height: 50
+
+  # ---------------------------------------------------------------------------
+  # READONLY and HIDDEN FIELDS
+  # ---------------------------------------------------------------------------
+  - name: form_id_readonly
+    type: text
+    label: 'Form ID (Read Only)'
+    page: 5
+    readOnly: true
+    default: 'FORM-2024-001'
+    position:
+      x: 300
+      y: 500
+      width: 150
+      height: 24
+
+  - name: hidden_tracking
+    type: text
+    label: 'Tracking ID'
+    page: 5
+    hidden: true
+    default: 'TRK-HIDDEN'
+    position:
+      x: 72
+      y: 100
+      width: 1
+      height: 1
+
+  # ---------------------------------------------------------------------------
+  # FIELD WITH VALIDATION
+  # ---------------------------------------------------------------------------
+  - name: validated_email
+    type: text
+    label: 'Validated Email'
+    page: 5
+    validation:
+      pattern: '^[\w.-]+@[\w.-]+\.\w+$'
+      message: 'Please enter a valid email address'
+    position:
+      x: 72
+      y: 400
+      width: 200
+      height: 24
+
+  - name: validated_number
+    type: text
+    label: 'Age (18-120)'
+    page: 5
+    validation:
+      min: 18
+      max: 120
+      message: 'Age must be between 18 and 120'
+    position:
+      x: 300
+      y: 400
+      width: 80
+      height: 24
+
+# =============================================================================
+# CALCULATIONS
+# =============================================================================
+# Define computed fields that calculate values from other fields.
+# Calculations reference fields by their name/fieldName attribute.
+# Note: Auto-generated table fields use pattern: {fieldPrefix}{rowNum}_{fieldSuffix}
+calculations:
+  # Basic arithmetic using auto-generated table fields (item + row# + _ + column suffix)
+  - name: line1_total
+    formula: 'item1_qty * item1_price'
+    format: currency
+    decimals: 2
+
+  # Sum multiple line totals
+  - name: subtotal
+    formula: 'item1_qty * item1_price + item2_qty * item2_price + item3_qty * item3_price'
+    format: currency
+    decimals: 2
+
+  # Percentage calculation (8.25% tax)
+  - name: tax_amount
+    formula: 'subtotal * 0.0825'
+    format: currency
+    decimals: 2
+
+  # Grand total combining subtotal and tax
+  - name: grand_total
+    formula: 'subtotal + tax_amount'
+    format: currency
+    decimals: 2
+
+  # Percentage format example
+  - name: tax_rate_display
+    formula: '8.25'
+    format: percentage
+    decimals: 2
+
+  # Number format (no currency symbol)
+  - name: total_items
+    formula: 'item1_qty + item2_qty + item3_qty + item4_qty + item5_qty'
+    format: number
+    decimals: 0
+
+# =============================================================================
+# CONDITIONAL FIELDS
+# =============================================================================
+# Show, hide, enable, or disable fields based on other field values.
+# Note: Referenced fields must exist in the schema (use 'name' for legacy fields).
+conditionalFields:
+  # Equals operator (default) - show field when priority is medium
+  - trigger:
+      field: priority_level
+      value: 'medium'
+    show:
+      - validated_email
+
+  # Not equals operator - show when priority is NOT low
+  - trigger:
+      field: priority_level
+      value: 'low'
+      operator: not_equals
+    show:
+      - form_id_readonly
+
+  # Greater than operator for numeric comparison
+  - trigger:
+      field: validated_number
+      value: 65
+      operator: greater
+    enable:
+      - applicant_signature
+
+  # Less than operator
+  - trigger:
+      field: validated_number
+      value: 21
+      operator: less
+    hide:
+      - legacy_text
+
+  # Contains operator for text matching
+  - trigger:
+      field: legacy_text
+      value: 'test'
+      operator: contains
+    disable:
+      - hidden_tracking
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+# Cross-field validation rules using if/then conditions.
+# These rules validate relationships between fields.
+validation:
+  rules:
+    # Numeric range validation
+    - if: 'validated_number > 120'
+      then: 'error: Age cannot exceed 120'
+
+    # Numeric threshold warning
+    - if: 'validated_number > 65'
+      then: 'warning: Senior citizen discount may apply'
+
+    # Required signature when terms agreed
+    - if: 'agree_terms == true'
+      then: 'info: Please sign the form to complete submission'
