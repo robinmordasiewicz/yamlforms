@@ -11,6 +11,7 @@ import { loadConfig, generateOutputFilename } from '../config.js';
 import { parseSchema } from '../../parsers/schema.js';
 import { generateAndSavePdf } from '../../generators/pdf/index.js';
 import { generateAndSaveHtml } from '../../generators/html/index.js';
+import { generateAndSaveDocx } from '../../generators/docx/index.js';
 
 export interface GenerateResult {
   format: OutputFormat;
@@ -87,6 +88,20 @@ export async function executeGenerate(options: GenerateOptions): Promise<Generat
             success: true,
           });
           break;
+
+        case 'docx': {
+          const docxResult = await generateAndSaveDocx({ schema, config: config.docx }, outputPath);
+          results.push({
+            format,
+            outputPath,
+            success: true,
+            details: {
+              fieldCount: docxResult.fieldCount,
+              pageCount: docxResult.pageCount,
+            },
+          });
+          break;
+        }
 
         default: {
           const unknownFormat = format as string;

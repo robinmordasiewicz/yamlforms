@@ -79,7 +79,7 @@ program
   .description('Generate documents from form schema')
   .argument('<schema>', 'Path to form schema YAML file')
   .option('-o, --output <directory>', 'Output directory')
-  .option('-f, --format <formats>', 'Output formats (comma-separated: pdf,html)', 'pdf')
+  .option('-f, --format <formats>', 'Output formats (comma-separated: pdf,html,docx)', 'pdf')
   .option('-c, --config <path>', 'Path to configuration file')
   .option('-w, --watch', 'Watch for file changes and regenerate')
   .option('-v, --verbose', 'Verbose output')

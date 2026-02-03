@@ -3,7 +3,7 @@
  * Defines the structure for yamldocs.config.yaml
  */
 
-export type OutputFormat = 'pdf' | 'html';
+export type OutputFormat = 'pdf' | 'html' | 'docx';
 
 export type PageSize = 'letter' | 'a4' | 'legal' | 'tabloid';
 
@@ -43,6 +43,15 @@ export interface HtmlConfig {
   pageLayout: PageLayoutConfig;
 }
 
+export interface DocxConfig {
+  pageSize: PageSize;
+  margins: PageMargins;
+  fonts: FontConfig;
+  embedFonts: boolean;
+  formFieldStyle: 'underline' | 'box' | 'shaded';
+  includeFormFieldHints: boolean;
+}
+
 export interface InputConfig {
   schemas: string;
   styles: string;
@@ -59,6 +68,7 @@ export interface Config {
   output: OutputConfig;
   pdf: PdfConfig;
   html: HtmlConfig;
+  docx: DocxConfig;
 }
 
 export interface GenerateOptions {
@@ -116,6 +126,22 @@ export const DEFAULT_CONFIG: Config = {
       pageSize: 'letter', // Match PDF default for consistent table widths
       showPageNumbers: true,
     },
+  },
+  docx: {
+    pageSize: 'letter',
+    margins: {
+      top: 72,
+      bottom: 72,
+      left: 72,
+      right: 72,
+    },
+    fonts: {
+      default: 'Helvetica',
+      monospace: 'Courier',
+    },
+    embedFonts: false,
+    formFieldStyle: 'box',
+    includeFormFieldHints: true,
   },
 };
 

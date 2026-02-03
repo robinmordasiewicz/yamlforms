@@ -20,7 +20,7 @@ inputs:
     required: false
     default: 'dist'
   format:
-    description: 'Output formats: pdf, html, or both (comma-separated)'
+    description: 'Output formats: pdf, html, docx (comma-separated)'
     required: false
     default: 'pdf'
   fail-on-error:
@@ -55,6 +55,8 @@ outputs:
     description: 'Number of PDF files generated'
   html-count:
     description: 'Number of HTML files generated'
+  docx-count:
+    description: 'Number of DOCX files generated'
   validation-errors:
     description: 'JSON array of validation errors (if any)'
   pages-url:

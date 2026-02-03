@@ -9,6 +9,7 @@ import { mkdir } from 'fs/promises';
 import { parseSchema, SchemaValidationError } from '../parsers/schema.js';
 import { generatePdf, savePdf } from '../generators/pdf/index.js';
 import { generateHtml, saveHtml } from '../generators/html/index.js';
+import { generateDocx, saveDocx } from '../generators/docx/index.js';
 import { publish, parsePublishOptions } from './publish/index.js';
 /**
  * Parse action inputs from environment
@@ -29,7 +30,7 @@ function getInputs() {
     const format = formatInput
         .split(',')
         .map((f) => f.trim().toLowerCase())
-        .filter((f) => f === 'pdf' || f === 'html');
+        .filter((f) => f === 'pdf' || f === 'html' || f === 'docx');
     if (format.length === 0) {
         format.push('pdf');
     }
@@ -137,6 +138,33 @@ async function generateFromSchema(schemaPath, outputDir, formats) {
                 core.error(`❌ Failed to generate HTML for ${schemaPath}: ${errorMessage}`);
             }
         }
+        // Generate DOCX if requested
+        if (formats.includes('docx')) {
+            try {
+                const docx = await generateDocx({
+                    schema,
+                    basePath: schemaDir,
+                });
+                const docxPath = join(outputDir, `${schemaName}.docx`);
+                await saveDocx(docx, docxPath);
+                results.push({
+                    file: docxPath,
+                    type: 'docx',
+                    success: true,
+                });
+                core.info(`✅ Generated DOCX: ${docxPath} (${docx.fieldCount} fields, ${docx.pageCount} pages)`);
+            }
+            catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                results.push({
+                    file: join(outputDir, `${schemaName}.docx`),
+                    type: 'docx',
+                    success: false,
+                    error: errorMessage,
+                });
+                core.error(`❌ Failed to generate DOCX for ${schemaPath}: ${errorMessage}`);
+            }
+        }
     }
     catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -206,6 +234,7 @@ async function runGenerate(inputs) {
         core.setOutput('files', JSON.stringify([]));
         core.setOutput('pdf-count', '0');
         core.setOutput('html-count', '0');
+        core.setOutput('docx-count', '0');
         return;
     }
     core.info(`Found ${files.length} schema file(s)`);
@@ -228,17 +257,20 @@ async function runGenerate(inputs) {
     const successfulFiles = allResults.filter((r) => r.success).map((r) => r.file);
     const pdfCount = allResults.filter((r) => r.type === 'pdf' && r.success).length;
     const htmlCount = allResults.filter((r) => r.type === 'html' && r.success).length;
+    const docxCount = allResults.filter((r) => r.type === 'docx' && r.success).length;
     const failureCount = allResults.filter((r) => !r.success).length;
     // Set outputs
     core.setOutput('files', JSON.stringify(successfulFiles));
     core.setOutput('pdf-count', String(pdfCount));
     core.setOutput('html-count', String(htmlCount));
+    core.setOutput('docx-count', String(docxCount));
     core.setOutput('validation-errors', JSON.stringify(validationErrors));
     // Summary
     core.info('');
     core.info('📊 Generation Summary:');
     core.info(`   PDF files: ${pdfCount}`);
     core.info(`   HTML files: ${htmlCount}`);
+    core.info(`   DOCX files: ${docxCount}`);
     if (failureCount > 0) {
         core.info(`   Failures: ${failureCount}`);
         if (inputs.failOnError) {

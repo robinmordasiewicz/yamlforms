@@ -89,6 +89,18 @@ function mergeConfig(base: Config, override: Partial<Config>): Config {
       ...base.html,
       ...override.html,
     },
+    docx: {
+      ...base.docx,
+      margins: {
+        ...base.docx.margins,
+        ...override.docx?.margins,
+      },
+      fonts: {
+        ...base.docx.fonts,
+        ...override.docx?.fonts,
+      },
+      ...override.docx,
+    },
   };
 }
 

@@ -29,7 +29,7 @@ export interface GeneratedFile {
     /** Full path to the file */
     path: string;
     /** File type */
-    type: 'pdf' | 'html';
+    type: 'pdf' | 'html' | 'docx';
     /** File name */
     name: string;
 }
