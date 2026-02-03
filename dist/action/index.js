@@ -105605,8 +105605,11 @@ function renderTableCell(cell, _col) {
             const fieldName = cell.fieldName ?? '';
             const options = (cell.options ?? [])
                 .map((opt) => {
-                const selected = cell.default === opt.value ? ' selected' : '';
-                return `<option value="${escapeHtml(opt.value)}"${selected}>${escapeHtml(opt.label)}</option>`;
+                // Handle both string and object options
+                const optValue = typeof opt === 'string' ? opt : opt.value;
+                const optLabel = typeof opt === 'string' ? opt : opt.label;
+                const selected = cell.default === optValue ? ' selected' : '';
+                return `<option value="${escapeHtml(optValue)}"${selected}>${escapeHtml(optLabel)}</option>`;
             })
                 .join('');
             return `<select name="${fieldName}" class="table-select">
