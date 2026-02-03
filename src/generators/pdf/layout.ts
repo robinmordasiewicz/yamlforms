@@ -264,7 +264,7 @@ export async function drawFooter(
 
         // Add link annotation over the icon
         if (url) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          /* eslint-disable @typescript-eslint/no-unsafe-assignment */
           const annotObj = ctx.doc.context.obj({
             Type: 'Annot',
             Subtype: 'Link',
@@ -275,8 +275,9 @@ export async function drawFooter(
               S: 'URI',
               URI: url,
             },
-          } as any);
+          });
           page.node.addAnnot(ctx.doc.context.register(annotObj));
+          /* eslint-enable @typescript-eslint/no-unsafe-assignment */
         }
 
         iconX += iconW + iconGap;
