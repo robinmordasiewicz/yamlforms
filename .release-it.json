@@ -9,11 +9,7 @@
     "pushArgs": ["--follow-tags"]
   },
   "github": {
-    "release": true,
-    "releaseName": "v${version}",
-    "draft": false,
-    "preRelease": false,
-    "tokenRef": "GITHUB_TOKEN"
+    "release": false
   },
   "npm": {
     "publish": true,
