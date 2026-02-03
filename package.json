@@ -22,6 +22,7 @@
   },
   "scripts": {
     "build": "tsc && npm run copy-assets",
+    "build:action": "npm run build && ncc build dist/action/index.js -o dist/action --source-map --license licenses.txt",
     "copy-assets": "mkdir -p dist/schemas && cp src/schemas/form-schema.json dist/schemas/",
     "dev": "tsc --watch",
     "start": "node dist/cli/index.js",
@@ -75,11 +76,14 @@
     "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/glob": "^0.5.0",
     "@eslint/js": "^9.39.2",
     "@release-it/conventional-changelog": "^10.0.4",
     "@types/css-tree": "^2.3.11",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.10.9",
+    "@vercel/ncc": "^0.38.3",
     "@types/pixelmatch": "^5.2.6",
     "@types/pngjs": "^6.0.5",
     "@typescript-eslint/eslint-plugin": "^8.54.0",

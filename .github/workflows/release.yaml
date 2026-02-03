@@ -38,9 +38,15 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+      - run: npm run build:action
       - run: npm run test:run
       - run: npm run lint
       - run: npm run typecheck
+
+      - name: Commit action bundle
+        run: |
+          git add dist/action/
+          git diff --staged --quiet || git commit -m "chore: rebuild action bundle for release"
 
       - name: Release
         id: release

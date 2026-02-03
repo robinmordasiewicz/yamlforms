@@ -1,0 +1,42 @@
+name: 'yamldocs'
+description: 'Generate fillable PDF forms with AcroForm fields from YAML schemas'
+author: 'robinmordasiewicz'
+
+branding:
+  icon: 'file-text'
+  color: 'blue'
+
+inputs:
+  command:
+    description: 'Command to run: generate, validate'
+    required: false
+    default: 'generate'
+  schema:
+    description: 'Path to YAML schema file or glob pattern (e.g., "schemas/*.yaml")'
+    required: true
+  output:
+    description: 'Output directory for generated files'
+    required: false
+    default: 'dist'
+  format:
+    description: 'Output formats: pdf, html, or both (comma-separated)'
+    required: false
+    default: 'pdf'
+  fail-on-error:
+    description: 'Fail the action if validation errors occur'
+    required: false
+    default: 'true'
+
+outputs:
+  files:
+    description: 'JSON array of generated file paths'
+  pdf-count:
+    description: 'Number of PDF files generated'
+  html-count:
+    description: 'Number of HTML files generated'
+  validation-errors:
+    description: 'JSON array of validation errors (if any)'
+
+runs:
+  using: 'node20'
+  main: 'dist/action/index.js'

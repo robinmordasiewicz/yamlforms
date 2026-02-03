@@ -3,6 +3,8 @@ node_modules/
 
 # Build output
 dist/
+# Keep action bundle for GitHub Actions
+!dist/action/
 
 # Generated files
 *.pdf

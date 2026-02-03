@@ -1,0 +1,103 @@
+name: Build Action
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'action.yml'
+      - 'package.json'
+      - 'tsconfig.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'action.yml'
+      - 'package.json'
+      - 'tsconfig.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Build action
+        run: npm run build:action
+
+      - name: Verify action bundle exists
+        run: |
+          if [ ! -f "dist/action/index.js" ]; then
+            echo "Error: dist/action/index.js not found"
+            exit 1
+          fi
+          echo "Action bundle size: $(wc -c < dist/action/index.js) bytes"
+
+      - name: Commit bundled action
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check if there are changes to commit
+          if git diff --quiet dist/action/; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add dist/action/
+          git commit -m "chore: rebuild action bundle [skip ci]"
+          git push
+
+  test-action:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build:action
+
+      - name: Test action - validate command
+        uses: ./
+        with:
+          command: validate
+          schema: 'tests/fixtures/schemas/valid/simple-form.yaml'
+
+      - name: Test action - generate command
+        uses: ./
+        with:
+          command: generate
+          schema: 'tests/fixtures/schemas/valid/simple-form.yaml'
+          output: 'test-output'
+          format: 'pdf,html'
+
+      - name: Verify generated files
+        run: |
+          ls -la test-output/
+          if [ ! -f "test-output/simple-form.pdf" ]; then
+            echo "Error: PDF not generated"
+            exit 1
+          fi
+          if [ ! -f "test-output/simple-form.html" ]; then
+            echo "Error: HTML not generated"
+            exit 1
+          fi
+          echo "✅ All files generated successfully"

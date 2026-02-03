@@ -88,6 +88,74 @@ Initialize a new project with sample files.
 yamldocs init [directory]
 ```
 
+## GitHub Action
+
+Use yamldocs in your CI/CD workflows to generate PDF forms automatically.
+
+### Basic Usage
+
+```yaml
+- uses: robinmordasiewicz/yamldocs@v1
+  with:
+    schema: 'schemas/my-form.yaml'
+    output: 'dist'
+```
+
+### Inputs
+
+| Input           | Description                              | Required | Default    |
+| --------------- | ---------------------------------------- | -------- | ---------- |
+| `command`       | Command to run: `generate` or `validate` | No       | `generate` |
+| `schema`        | Path to YAML schema file or glob pattern | Yes      | -          |
+| `output`        | Output directory for generated files     | No       | `dist`     |
+| `format`        | Output formats: `pdf`, `html`, or both   | No       | `pdf`      |
+| `fail-on-error` | Fail the action if errors occur          | No       | `true`     |
+
+### Outputs
+
+| Output              | Description                              |
+| ------------------- | ---------------------------------------- |
+| `files`             | JSON array of generated file paths       |
+| `pdf-count`         | Number of PDF files generated            |
+| `html-count`        | Number of HTML files generated           |
+| `validation-errors` | JSON array of validation errors (if any) |
+
+### Examples
+
+**Generate PDF and HTML:**
+
+```yaml
+- uses: robinmordasiewicz/yamldocs@v1
+  with:
+    schema: 'schemas/*.yaml'
+    output: 'dist/forms'
+    format: 'pdf,html'
+```
+
+**Validate schemas in PRs:**
+
+```yaml
+- uses: robinmordasiewicz/yamldocs@v1
+  with:
+    command: validate
+    schema: 'schemas/**/*.yaml'
+```
+
+**Upload generated files as artifacts:**
+
+```yaml
+- uses: robinmordasiewicz/yamldocs@v1
+  id: yamldocs
+  with:
+    schema: 'schemas/order-form.yaml'
+    output: 'dist'
+
+- uses: actions/upload-artifact@v4
+  with:
+    name: forms
+    path: dist/
+```
+
 ## Schema Format
 
 ### Basic Structure
