@@ -50,13 +50,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Check if there are changes to commit
-          if git diff --quiet dist/action/; then
+          # Force add since dist/ is in .gitignore (but dist/action/ is excepted)
+          git add -f dist/action/
+
+          # Check if there are staged changes to commit
+          if git diff --staged --quiet; then
             echo "No changes to commit"
             exit 0
           fi
 
-          git add dist/action/
           git commit -m "chore: rebuild action bundle [skip ci]"
           git push
 
