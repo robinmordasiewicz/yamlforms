@@ -18,7 +18,7 @@ inputs:
   output:
     description: 'Output directory for generated files'
     required: false
-    default: 'dist'
+    default: 'site'
   format:
     description: 'Output formats: pdf, html, docx (comma-separated)'
     required: false

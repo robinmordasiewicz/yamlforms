@@ -30,7 +30,7 @@ jobs:
         id: generate
         with:
           schema: 'schemas/*.yaml'
-          output: 'dist'
+          output: 'site'
           format: 'pdf,html,docx'
           generate-index: true
           index-title: 'YAMLForms Generated Documents'
@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-docs
-          path: dist/
+          path: site/
           retention-days: 30
 
   deploy:
@@ -56,7 +56,7 @@ jobs:
         uses: robinmordasiewicz/yamlforms@v1
         with:
           schema: 'schemas/*.yaml'
-          output: 'dist'
+          output: 'site'
           format: 'pdf,html,docx'
           generate-index: true
           index-title: 'YAMLForms Generated Documents'

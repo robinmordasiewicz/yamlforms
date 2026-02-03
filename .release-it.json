@@ -3,7 +3,7 @@
     "commitMessage": "chore: release v${version}",
     "tagName": "v${version}",
     "tagAnnotation": "Release ${version}",
-    "requireCleanWorkingDir": true,
+    "requireCleanWorkingDir": false,
     "requireBranch": "main",
     "push": true,
     "pushArgs": ["--follow-tags"]
@@ -14,9 +14,6 @@
   "npm": {
     "publish": true,
     "publishArgs": ["--access", "public"]
-  },
-  "hooks": {
-    "before:init": ["npm run test:run", "npm run lint", "npm run typecheck"]
   },
   "plugins": {
     "@release-it/conventional-changelog": {

@@ -41,7 +41,7 @@ interface ValidationError {
 function getInputs(): ActionInputs {
   const command = core.getInput('command') || 'generate';
   const schema = core.getInput('schema', { required: true });
-  const output = core.getInput('output') || 'dist';
+  const output = core.getInput('output') || 'site';
   const formatInput = core.getInput('format') || 'pdf';
   const failOnError = core.getBooleanInput('fail-on-error');
 

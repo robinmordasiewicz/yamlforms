@@ -6,6 +6,9 @@ dist/
 # Keep action bundle for GitHub Actions
 !dist/action/
 
+# Generated site output
+site/
+
 # Generated files
 *.pdf
 
