@@ -289,10 +289,9 @@ export async function createFooter(
   if (socialEntries.length > 0) {
     const socialRuns: (TextRun | ExternalHyperlink)[] = [];
 
-    for (let index = 0; index < socialEntries.length; index++) {
-      const [key, url] = socialEntries[index];
-
-      if (index > 0) {
+    let socialIndex = 0;
+    for (const [key, url] of socialEntries) {
+      if (socialIndex > 0) {
         socialRuns.push(
           new TextRun({
             text: '  ',
@@ -301,6 +300,7 @@ export async function createFooter(
           })
         );
       }
+      socialIndex++;
 
       const iconBytes = await loadSocialIconBytes(key);
       if (iconBytes) {
