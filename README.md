@@ -1,82 +1,88 @@
 # yamldocs
 
-Generate fillable PDF forms with interactive AcroForm fields from markdown content and YAML schema definitions.
+Generate fillable PDF forms with interactive AcroForm fields from YAML schema definitions.
+
+[![npm version](https://img.shields.io/npm/v/yamldocs.svg)](https://www.npmjs.com/package/yamldocs)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
-- **Fillable PDF Forms**: Generate PDFs with interactive form fields (text, checkbox, radio, dropdown, textarea, signature)
-- **AcroForm Support**: Full AcroForm field support compatible with Adobe Reader, Chrome, and other PDF viewers
-- **Multi-format Output**: Generate PDF, HTML, and DOCX from the same source
-- **YAML Schema**: Define form fields declaratively with validation, positioning, and styling
-- **Markdown Content**: Write form content in familiar markdown format
-- **CLI Tool**: Simple command-line interface for generation and validation
-- **Watch Mode**: Auto-regenerate on file changes during development
-- **GitHub Actions**: Ready-to-use CI/CD workflow for automated generation
+- **Fillable PDF Forms** - Generate PDFs with interactive AcroForm fields (text, checkbox, radio, dropdown, textarea, signature)
+- **Flow Layout** - Content automatically flows across pages without manual positioning
+- **Rich Content Types** - Headings, paragraphs, tables, admonitions, rules, and spacers
+- **Tables with Form Fields** - Embed form fields directly in table cells
+- **Calculated Fields** - Define formulas that compute values from other fields
+- **Conditional Logic** - Show/hide fields based on other field values
+- **Custom Styling** - CSS-based styling with WCAG 2.1 AA compliant defaults
+- **Multi-format Output** - Generate PDF and HTML from the same schema
+- **Watch Mode** - Auto-regenerate on file changes during development
 
 ## Installation
 
 ```bash
-# Install globally
 npm install -g yamldocs
-
-# Or use with npx
-npx yamldocs generate content.md --schema schema.yaml
 ```
+
+**Requirements:** Node.js 24+
 
 ## Quick Start
 
-1. **Initialize a new project:**
-
 ```bash
+# Initialize a new project
 yamldocs init my-forms
 cd my-forms
-```
 
-2. **Edit your content and schema:**
-   - `content/sample.md` - Your form content in markdown
-   - `schemas/sample-form.yaml` - Form field definitions
+# Generate PDF from schema
+yamldocs generate schemas/sample.yaml --output dist
 
-3. **Generate documents:**
+# Generate both PDF and HTML
+yamldocs generate schemas/sample.yaml --format pdf,html
 
-```bash
-yamldocs generate content/sample.md --schema schemas/sample-form.yaml --format pdf,html
+# Watch for changes
+yamldocs generate schemas/sample.yaml --watch
 ```
 
 ## CLI Commands
 
-### Generate Documents
+### generate
+
+Generate documents from a YAML schema.
 
 ```bash
-yamldocs generate <content.md> [options]
+yamldocs generate <schema> [options]
 
 Options:
-  -s, --schema <path>      Path to form schema YAML file
-  -o, --output <dir>       Output directory (default: ./dist)
-  -f, --format <formats>   Output formats: pdf,html,docx (default: pdf)
-  -c, --config <path>      Path to configuration file
-  -w, --watch              Watch for file changes
-  -v, --verbose            Verbose output
+  -o, --output <dir>      Output directory (default: current directory)
+  -f, --format <formats>  Output formats: pdf,html (default: pdf)
+  -w, --watch             Watch for file changes and regenerate
+  -v, --verbose           Verbose output
 ```
 
-### Validate Schema
+### validate
+
+Validate a schema file against the JSON schema.
 
 ```bash
-yamldocs validate <schema.yaml> [options]
+yamldocs validate <schema> [options]
 
 Options:
-  -v, --verbose    Show detailed validation info
+  -v, --verbose  Show detailed validation info
 ```
 
-### Preview Fields
+### preview
+
+Preview form fields without generating files.
 
 ```bash
-yamldocs preview <schema.yaml> [options]
+yamldocs preview <schema> [options]
 
 Options:
-  -f, --format <format>    Output format: table, json, yaml (default: table)
+  -f, --format <format>  Output format: table, json, yaml (default: table)
 ```
 
-### Initialize Project
+### init
+
+Initialize a new project with sample files.
 
 ```bash
 yamldocs init [directory]
@@ -84,68 +90,112 @@ yamldocs init [directory]
 
 ## Schema Format
 
-Form fields are defined in YAML:
+### Basic Structure
 
 ```yaml
 $schema: 'form-schema/v1'
+
 form:
-  id: 'my-form'
-  title: 'My Form'
+  id: my-form
+  title: My Form
   version: '1.0.0'
   pages: 1
+  positioning: flow # Automatic layout (recommended)
+  numbering: true # Auto-number field labels
 
-fields:
-  - name: 'full_name'
-    type: 'text'
+content:
+  - type: heading
+    level: 1
+    text: 'Form Title'
+
+  - type: paragraph
+    text: 'Instructions for filling out this form.'
+
+  - type: field
     label: 'Full Name'
-    page: 1
+    fieldType: text
+    fieldName: full_name
     required: true
-    maxLength: 100
-    position:
-      x: 72
-      y: 650
-      width: 250
-      height: 24
 
-  - name: 'email'
-    type: 'text'
-    label: 'Email'
-    page: 1
-    required: true
-    validation:
-      pattern: "^[\\w.-]+@[\\w.-]+\\.\\w+$"
-    position:
-      x: 72
-      y: 590
-      width: 250
-      height: 24
-
-  - name: 'department'
-    type: 'dropdown'
-    label: 'Department'
-    page: 1
-    options:
-      - 'Engineering'
-      - 'Marketing'
-      - 'Sales'
-    position:
-      x: 72
-      y: 530
-      width: 150
-      height: 24
-
-  - name: 'subscribe'
-    type: 'checkbox'
-    label: 'Subscribe to newsletter'
-    page: 1
-    position:
-      x: 72
-      y: 480
+fields: [] # Legacy field definitions (optional with flow mode)
 ```
 
-## Field Types
+### Content Types
 
-| Type        | Description            | Options                                  |
+#### Heading
+
+```yaml
+- type: heading
+  level: 1 # 1-6
+  text: 'Section Title'
+```
+
+#### Paragraph
+
+```yaml
+- type: paragraph
+  text: 'Body text content.'
+  maxWidth: 400
+  fontSize: 12
+```
+
+#### Field (Standalone)
+
+```yaml
+- type: field
+  label: 'Email Address'
+  fieldType: text # text, dropdown, checkbox, textarea
+  fieldName: email
+  width: 300
+  placeholder: 'user@example.com'
+  required: true
+```
+
+#### Table with Form Fields
+
+```yaml
+- type: table
+  label: 'Contact Information'
+  columns:
+    - { label: 'Name', width: 150 }
+    - { label: 'Email', width: 200 }
+    - { label: 'Primary', width: 60 }
+  rows:
+    - cells:
+        - { type: text, fieldName: contact_name_1 }
+        - { type: text, fieldName: contact_email_1 }
+        - { type: checkbox, fieldName: contact_primary_1 }
+    - cells:
+        - { type: text, fieldName: contact_name_2 }
+        - { type: text, fieldName: contact_email_2 }
+        - { type: checkbox, fieldName: contact_primary_2 }
+```
+
+#### Admonition
+
+```yaml
+- type: admonition
+  variant: warning # warning, note, info, tip, danger
+  title: 'Important'
+  text: 'Please read carefully before proceeding.'
+```
+
+#### Rule (Horizontal Line)
+
+```yaml
+- type: rule
+```
+
+#### Spacer
+
+```yaml
+- type: spacer
+  height: 24
+```
+
+### Field Types
+
+| Type        | Description            | Properties                               |
 | ----------- | ---------------------- | ---------------------------------------- |
 | `text`      | Single-line text input | `maxLength`, `placeholder`, `validation` |
 | `textarea`  | Multi-line text area   | `maxLength`, `multiline`                 |
@@ -154,48 +204,47 @@ fields:
 | `dropdown`  | Dropdown select        | `options`, `default`                     |
 | `signature` | Signature field        | -                                        |
 
-## Field Properties
+### Field Options
 
-| Property     | Type    | Description                       |
-| ------------ | ------- | --------------------------------- |
-| `name`       | string  | Unique field identifier           |
-| `type`       | string  | Field type (see above)            |
-| `label`      | string  | Display label                     |
-| `page`       | number  | Page number (1-indexed)           |
-| `required`   | boolean | Whether field is required         |
-| `position`   | object  | `{x, y, width, height}` in points |
-| `fontSize`   | number  | Font size in points               |
-| `default`    | any     | Default value                     |
-| `readOnly`   | boolean | Make field read-only              |
-| `validation` | object  | Validation rules                  |
-| `minLength`  | number  | Minimum text length               |
-| `maxLength`  | number  | Maximum text length               |
-| `min`        | number  | Minimum numeric value             |
-| `max`        | number  | Maximum numeric value             |
+For radio and dropdown fields:
 
-## Advanced Features
+```yaml
+options:
+  - value: 'us'
+    label: 'United States'
+  - value: 'ca'
+    label: 'Canada'
+  - value: 'uk'
+    label: 'United Kingdom'
+
+# Or simple format (value = label)
+options:
+  - 'Option A'
+  - 'Option B'
+  - 'Option C'
+```
 
 ### Calculated Fields
 
-Define fields that automatically compute values based on other fields:
+Define fields that compute values from other fields:
 
 ```yaml
 calculations:
-  - name: 'total'
-    formula: 'price * quantity'
-    format: 'currency'
+  - name: subtotal
+    formula: 'quantity * price'
+    format: currency
     decimals: 2
 
-  - name: 'tax'
-    formula: 'total * 0.1'
-    format: 'currency'
+  - name: tax
+    formula: 'subtotal * 0.1'
+    format: currency
 
-  - name: 'grand_total'
-    formula: 'total + tax'
-    format: 'currency'
+  - name: total
+    formula: 'subtotal + tax'
+    format: currency
 ```
 
-Supported formats: `number`, `currency`, `percentage`, `text`
+**Formats:** `number`, `currency`, `percentage`, `text`
 
 ### Conditional Fields
 
@@ -204,35 +253,30 @@ Show or hide fields based on other field values:
 ```yaml
 conditionalFields:
   - trigger:
-      field: 'employment_type'
-      value: 'contract'
-    show: ['contract_duration', 'hourly_rate']
+      field: employment_type
+      value: 'contractor'
+    show: ['hourly_rate', 'contract_end_date']
     hide: ['annual_salary']
 
   - trigger:
-      field: 'include_shipping'
+      field: has_dependents
       value: true
-    show: ['shipping_address']
+    show: ['dependent_count', 'dependent_names']
 
   - trigger:
-      field: 'age'
-      value: '18'
-      operator: 'greaterThan'
-    show: ['adult_options']
+      field: age
+      value: 18
+      operator: greater
+    show: ['adult_consent']
 ```
 
-Supported operators: `equals`, `notEquals`, `contains`, `greaterThan`, `lessThan`, `isEmpty`, `isNotEmpty`
+**Operators:** `equals`, `not_equals`, `contains`, `greater`, `less`
 
 ### Validation Rules
-
-Define custom validation rules with conditional logic:
 
 ```yaml
 validation:
   rules:
-    - if: 'start_date < today()'
-      then: 'error: Start date must be in the future'
-
     - if: 'end_date < start_date'
       then: 'error: End date must be after start date'
 
@@ -242,104 +286,56 @@ validation:
 
 ### Field Validation Patterns
 
-Built-in validation patterns:
-
 ```yaml
 fields:
-  - name: 'email'
-    type: 'text'
+  - name: email
+    type: text
+    label: 'Email'
     validation:
-      pattern: "^[\\w.-]+@[\\w.-]+\\.\\w+$"
+      pattern: '^[\w.-]+@[\w.-]+\.\w+$'
       message: 'Please enter a valid email address'
 
-  - name: 'phone'
-    type: 'text'
+  - name: phone
+    type: text
+    label: 'Phone'
     validation:
-      pattern: "^\\+?[\\d\\s()-]{10,}$"
+      pattern: '^\+?[\d\s()-]{10,}$'
       message: 'Please enter a valid phone number'
-
-  - name: 'zip_code'
-    type: 'text'
-    validation:
-      pattern: "^\\d{5}(-\\d{4})?$"
-      message: 'Please enter a valid ZIP code'
 ```
 
-## Configuration
+## Styling
 
-Create `yamldocs.config.yaml`:
+Custom CSS stylesheets can override the default styling:
 
 ```yaml
-input:
-  content: './content'
-  schemas: './schemas'
-  styles: './styles'
-
-output:
-  directory: './dist'
-  formats:
-    - pdf
-    - html
-
-pdf:
-  pageSize: 'letter' # or "a4"
-  margins:
-    top: 72
-    bottom: 72
-    left: 72
-    right: 72
-
-html:
-  embedStyles: true
-  includeJs: true
+form:
+  id: my-form
+  title: My Form
+  stylesheet: './custom.css'
 ```
 
-## GitHub Actions
-
-The included workflow automatically generates documents when content or schemas change:
-
-```yaml
-# .github/workflows/generate-docs.yaml
-name: Generate Documentation
-
-on:
-  push:
-    paths:
-      - 'content/**'
-      - 'schemas/**'
-```
-
-## Examples
-
-See the `examples/` directory for complete examples:
-
-- `simple-form/` - Basic contact form
-- `advanced-form/` - Multi-page job application
+The default stylesheet follows accessibility standards (WCAG 2.1 AA, ISO 9241-115).
 
 ## Development
 
 ```bash
-# Clone repository
+# Clone and install
 git clone https://github.com/robinmordasiewicz/yamldocs.git
 cd yamldocs
-
-# Install dependencies
 npm install
 
 # Build
 npm run build
 
-# Run in development
-npm run dev
-
 # Run tests
 npm test
+
+# Type checking
+npm run typecheck
+
+# Linting
+npm run lint
 ```
-
-## Requirements
-
-- Node.js 18+
-- Pandoc (for DOCX output)
 
 ## License
 
