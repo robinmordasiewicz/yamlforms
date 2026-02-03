@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.2.0](https://github.com/robinmordasiewicz/yamlforms/compare/v1...v1.2.0) (2026-02-03)
+
+### Bug Fixes
+
+- add --no-verify to release workflow and add DOCX to docs generation ([7f21611](https://github.com/robinmordasiewicz/yamlforms/commit/7f2161100b5b998983c8f82b310fbb2286a82336))
+
+### Features
+
+- Add DOCX generator support and comprehensive documentation ([c1f3c22](https://github.com/robinmordasiewicz/yamlforms/commit/c1f3c2277da1d2ad226122ca4a527fee18289a34)), closes [#49](https://github.com/robinmordasiewicz/yamlforms/issues/49)
+- generate index pages independent of publishing ([ddadaa9](https://github.com/robinmordasiewicz/yamlforms/commit/ddadaa981c5313d69bf553025b2f937e48b2ebad)), closes [#53](https://github.com/robinmordasiewicz/yamlforms/issues/53)
+
 # [1.1.0](https://github.com/robinmordasiewicz/yamlforms/compare/v1...v1.1.0) (2026-02-03)
 
 ### Features
